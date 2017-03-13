@@ -171,6 +171,72 @@ end
 
 %% Feature extraction
 
+%drinking
+Fs = 10000;      %sample frequentie
+T = 1/Fs;       %sample periode
+L = numel(drinking_result);       %lengte van het signaal
+t = (0:L-1)*T;  %tijd vector
+
+Y = fft(drinking_result,Fs);
+twoSideSpectrum = abs(Y/L);
+singleSideSpectrum = twoSideSpectrum(1:L/2+1);
+singleSideSpectrum(2:end-1) = 2*singleSideSpectrum(2:end-1);
+f = Fs*(0:(L/2))/L;
+figure('NumberTitle','off','Name','Drinking FFT result'), plot(f,singleSideSpectrum)
+title('spectrum of the signal')
+xlabel('f (Hz)')
+ylabel('|singleSideSpectrum(f)|')
+
+%brush
+Fs = 10000;      %sample frequentie
+T = 1/Fs;       %sample periode
+L = numel(brush_result);       %lengte van het signaal
+t = (0:L-1)*T;  %tijd vector
+
+Y = fft(brush_result,Fs);
+twoSideSpectrum = abs(Y/L);
+singleSideSpectrum = twoSideSpectrum(1:L/2+1);
+singleSideSpectrum(2:end-1) = 2*singleSideSpectrum(2:end-1);
+f = Fs*(0:(L/2))/L;
+figure('NumberTitle','off','Name','Brush FFT result'), plot(f,singleSideSpectrum)
+title('spectrum of the signal')
+xlabel('f (Hz)')
+ylabel('|singleSideSpectrum(f)|')
+
+
+%writing
+Fs = 10000;      %sample frequentie
+T = 1/Fs;       %sample periode
+L = numel(writing_result);       %lengte van het signaal
+t = (0:L-1)*T;  %tijd vector
+
+Y = fft(writing_result,Fs);
+twoSideSpectrum = abs(Y/L);
+singleSideSpectrum = twoSideSpectrum(1:L/2+1);
+singleSideSpectrum(2:end-1) = 2*singleSideSpectrum(2:end-1);
+f = Fs*(0:(L/2))/L;
+figure('NumberTitle','off','Name','Writing FFT result'), plot(f,singleSideSpectrum)
+title('spectrum of the signal')
+xlabel('f (Hz)')
+ylabel('|singleSideSpectrum(f)|')
+
+%Shoe
+Fs = 10000;      %sample frequentie
+T = 1/Fs;       %sample periode
+L = numel(shoe_result);       %lengte van het signaal
+t = (0:L-1)*T;  %tijd vector
+
+Y = fft(shoe_result,Fs);
+twoSideSpectrum = abs(Y/L);
+singleSideSpectrum = twoSideSpectrum(1:L/2+1);
+singleSideSpectrum(2:end-1) = 2*singleSideSpectrum(2:end-1);
+f = Fs*(0:(L/2))/L;
+figure('NumberTitle','off','Name','Shoe FFT result'), plot(f,singleSideSpectrum)
+title('spectrum of the signal')
+xlabel('f (Hz)')
+ylabel('|singleSideSpectrum(f)|')
+
+
 %Time domain:
 % -mean amplitude
 % array maken van de amplitudes -> mean berekenen
