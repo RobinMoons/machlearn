@@ -172,7 +172,7 @@ end
 %% Feature extraction
 
 %drinking
-Fs = 10000;      %sample frequentie
+Fs = 2048;      %sample frequentie
 T = 1/Fs;       %sample periode
 L = numel(drinking_result);       %lengte van het signaal
 t = (0:L-1)*T;  %tijd vector
@@ -188,7 +188,7 @@ xlabel('f (Hz)')
 ylabel('|singleSideSpectrum(f)|')
 
 %brush
-Fs = 10000;      %sample frequentie
+Fs = 2048;      %sample frequentie
 T = 1/Fs;       %sample periode
 L = numel(brush_result);       %lengte van het signaal
 t = (0:L-1)*T;  %tijd vector
@@ -205,7 +205,7 @@ ylabel('|singleSideSpectrum(f)|')
 
 
 %writing
-Fs = 10000;      %sample frequentie
+Fs = 2048;      %sample frequentie
 T = 1/Fs;       %sample periode
 L = numel(writing_result);       %lengte van het signaal
 t = (0:L-1)*T;  %tijd vector
@@ -221,7 +221,7 @@ xlabel('f (Hz)')
 ylabel('|singleSideSpectrum(f)|')
 
 %Shoe
-Fs = 10000;      %sample frequentie
+Fs = 2048;      %sample frequentie
 T = 1/Fs;       %sample periode
 L = numel(shoe_result);       %lengte van het signaal
 t = (0:L-1)*T;  %tijd vector
