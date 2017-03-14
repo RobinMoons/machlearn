@@ -75,6 +75,8 @@ for ii=1:amountDrinking
         % Calculate resultant
         drinking_result(jj) = sqrt(drinking_x_Measurement(jj)^2 + drinking_y_Measurement(jj)^2 + drinking_z_Measurement(jj)^2);
     end
+    mean_drinking_result = mean(drinking_result);
+    drinking_result = drinking_result - mean_drinking_result;
     % Plot resultant in 1 subplot
     subplot(4,4,ii)
     plot(drinking_result)
@@ -105,6 +107,8 @@ for ii=1:amountBrush
         % Calculate resultant
         brush_result(jj) = sqrt(brush_x_Measurement(jj)^2 + brush_y_Measurement(jj)^2 + brush_z_Measurement(jj)^2);
     end
+    mean_brush_result = mean(brush_result);
+    brush_result = brush_result - mean_brush_result;
     % Plot resultant in 1 subplot
     subplot(4,4,ii)
     plot(brush_result)
@@ -134,6 +138,8 @@ for ii=1:amountWriting
         % Calculate resultant
         writing_result(jj) = sqrt(writing_x_Measurement(jj)^2 + writing_y_Measurement(jj)^2 + writing_z_Measurement(jj)^2);
     end
+    mean_writing_result = mean(writing_result);
+    writing_result = writing_result - mean_writing_result;
     % Plot resultant in 1 subplot
     subplot(4,4,ii)
     plot(writing_result)
@@ -163,6 +169,8 @@ for ii=1:amountShoe
         % Calculate resultant
         shoe_result(jj) = sqrt(shoe_x_Measurement(jj)^2 + shoe_y_Measurement(jj)^2 + shoe_z_Measurement(jj)^2);
     end
+    mean_shoe_result = mean(shoe_result);
+    shoe_result = shoe_result - mean_shoe_result;
     % Plot resultant in 1 subplot
     subplot(4,4,ii)
     plot(shoe_result)
@@ -177,11 +185,11 @@ T = 1/Fs;       %sample periode
 L = numel(drinking_result);       %lengte van het signaal
 t = (0:L-1)*T;  %tijd vector
 
-Y = fft(drinking_result,Fs);
+Y = fft(drinking_result,L);
 twoSideSpectrum = abs(Y/L);
-singleSideSpectrum = twoSideSpectrum(1:L/2+1);
+singleSideSpectrum = twoSideSpectrum(1:L/2+0);
 singleSideSpectrum(2:end-1) = 2*singleSideSpectrum(2:end-1);
-f = Fs*(0:(L/2))/L;
+f = Fs*(0:(L/2)-1)/L;
 figure('NumberTitle','off','Name','Drinking FFT result'), plot(f,singleSideSpectrum)
 title('spectrum of the signal')
 xlabel('f (Hz)')
@@ -193,7 +201,7 @@ T = 1/Fs;       %sample periode
 L = numel(brush_result);       %lengte van het signaal
 t = (0:L-1)*T;  %tijd vector
 
-Y = fft(brush_result,Fs);
+Y = fft(brush_result,L);
 twoSideSpectrum = abs(Y/L);
 singleSideSpectrum = twoSideSpectrum(1:L/2+1);
 singleSideSpectrum(2:end-1) = 2*singleSideSpectrum(2:end-1);
@@ -210,7 +218,7 @@ T = 1/Fs;       %sample periode
 L = numel(writing_result);       %lengte van het signaal
 t = (0:L-1)*T;  %tijd vector
 
-Y = fft(writing_result,Fs);
+Y = fft(writing_result,L);
 twoSideSpectrum = abs(Y/L);
 singleSideSpectrum = twoSideSpectrum(1:L/2+1);
 singleSideSpectrum(2:end-1) = 2*singleSideSpectrum(2:end-1);
@@ -226,7 +234,7 @@ T = 1/Fs;       %sample periode
 L = numel(shoe_result);       %lengte van het signaal
 t = (0:L-1)*T;  %tijd vector
 
-Y = fft(shoe_result,Fs);
+Y = fft(shoe_result,L);
 twoSideSpectrum = abs(Y/L);
 singleSideSpectrum = twoSideSpectrum(1:L/2+1);
 singleSideSpectrum(2:end-1) = 2*singleSideSpectrum(2:end-1);
