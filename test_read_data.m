@@ -179,6 +179,13 @@ end
 
 %% Feature extraction
 
+% Moet deze berekening niet per drinking_result in de lus gebeuren? Want
+% drinking_result wordt elke keer opnieuw gebruikt.
+% Time domain waardes.
+mean_amplitude = mean(drinking_result)
+std_amplitude = std(drinking_result)
+skewnessDrinking = skewness(drinking_result)
+
 %drinking
 Fs = 128;      %sample frequentie
 T = 1/Fs;       %sample periode
@@ -194,6 +201,9 @@ figure('NumberTitle','off','Name','Drinking FFT result'), plot(f,singleSideSpect
 title('spectrum of the signal')
 xlabel('f (Hz)')
 ylabel('|singleSideSpectrum(f)|')
+% Percentile berekening.
+percentile25 = prctile(singleSideSpectrum,25);
+percintile75 = prctile(singleSideSpectrum,75);
 
 %brush
 Fs = 128;      %sample frequentie
