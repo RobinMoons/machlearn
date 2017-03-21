@@ -55,36 +55,51 @@ load('data.mat')
 % Calculate drinking
 figure('NumberTitle','off','Name','Drinking data')
 amountDrinking = numel(data.drinking);
+featureMatrix = zeros(amountDrinking,12);
+featureMatrixDrinking = zeros(amountDrinking, 3);
 for ii=1:amountDrinking
     % Get the x,y,z measurements
     drinking_x_Measurement = data.drinking(ii).x;
     drinking_y_Measurement = data.drinking(ii).y;
     drinking_z_Measurement = data.drinking(ii).z;
     % Calculate mean
-    drinking_x_mean = mean(drinking_x_Measurement);
-    drinking_y_mean = mean(drinking_y_Measurement);
-    drinking_z_mean = mean(drinking_z_Measurement);
+%     drinking_x_mean = mean(drinking_x_Measurement);
+%     drinking_y_mean = mean(drinking_y_Measurement);
+%     drinking_z_mean = mean(drinking_z_Measurement);
     % Resultant array
     N = numel(drinking_x_Measurement);
     drinking_result = zeros(N,1);
     % Subtract mean from each value
     for jj=1:N
-        drinking_x_Measurement(jj)=drinking_x_Measurement(jj)-drinking_x_mean;
-        drinking_y_Measurement(jj)=drinking_y_Measurement(jj)-drinking_y_mean;
-        drinking_z_Measurement(jj)=drinking_z_Measurement(jj)-drinking_z_mean;
+%         drinking_x_Measurement(jj)=drinking_x_Measurement(jj)-drinking_x_mean;
+%         drinking_y_Measurement(jj)=drinking_y_Measurement(jj)-drinking_y_mean;
+%         drinking_z_Measurement(jj)=drinking_z_Measurement(jj)-drinking_z_mean;
         % Calculate resultant
         drinking_result(jj) = sqrt(drinking_x_Measurement(jj)^2 + drinking_y_Measurement(jj)^2 + drinking_z_Measurement(jj)^2);
     end
     mean_drinking_result = mean(drinking_result);
     drinking_result = drinking_result - mean_drinking_result;
+    % Time domain waardes.
+    featureMatrix(1,ii) = mean(drinking_result);
+    featureMatrix(2,ii) = std(drinking_result);
+    featureMatrix(3,ii) = skewness(drinking_result);
+    % Alleen van drinking
+    featureMatrixDrinking(1,ii) = mean(drinking_result);
+    featureMatrixDrinking(1,ii) = std(drinking_result);
+    featureMatrixDrinking(1,ii) = skewness(drinking_result);
     % Plot resultant in 1 subplot
     subplot(4,4,ii)
     plot(drinking_result)
     title(ii);
 end
 
+% Class = [ones(amountDrinking,1);2*ones(amountBrush,1);3*ones(amountWriting,1);4*ones(amountShoe,1)];
+% Lijkt ook nog niet te werken
+ClassVector = rand(amountDrinking, 1) > 0.3;
+featureMatrix;
+gplotmatrix(featureMatrixDrinking, [],ClassVector);
 
-% Calculate brushing
+%% Calculate brushing
 figure('NumberTitle','off','Name','Brush data')
 amountBrush = numel(data.brush);
 for ii=1:amountBrush
@@ -93,22 +108,26 @@ for ii=1:amountBrush
     brush_y_Measurement = data.brush(ii).y;
     brush_z_Measurement = data.brush(ii).z;
     % Calculate mean
-    brush_x_mean = mean(brush_x_Measurement);
-    brush_y_mean = mean(brush_y_Measurement);
-    brush_z_mean = mean(brush_z_Measurement);
+    %brush_x_mean = mean(brush_x_Measurement);
+    %brush_y_mean = mean(brush_y_Measurement);
+    %brush_z_mean = mean(brush_z_Measurement);
     % Resultant array
     N = numel(brush_x_Measurement);
     brush_result = zeros(N,1);
     % Subtract mean from each value
     for jj=1:N
-        brush_x_Measurement(jj)=brush_x_Measurement(jj)-brush_x_mean;
-        brush_y_Measurement(jj)=brush_y_Measurement(jj)-brush_y_mean;
-        brush_z_Measurement(jj)=brush_z_Measurement(jj)-brush_z_mean;
+        %brush_x_Measurement(jj)=brush_x_Measurement(jj)-brush_x_mean;
+        %brush_y_Measurement(jj)=brush_y_Measurement(jj)-brush_y_mean;
+        %brush_z_Measurement(jj)=brush_z_Measurement(jj)-brush_z_mean;
         % Calculate resultant
         brush_result(jj) = sqrt(brush_x_Measurement(jj)^2 + brush_y_Measurement(jj)^2 + brush_z_Measurement(jj)^2);
     end
     mean_brush_result = mean(brush_result);
     brush_result = brush_result - mean_brush_result;
+    % Time domain waardes.
+    featureMatrix(4,ii) = mean(brush_result);
+    featureMatrix(5,ii) = std(brush_result);
+    featureMatrix(6,ii) = skewness(brush_result);
     % Plot resultant in 1 subplot
     subplot(4,4,ii)
     plot(brush_result)
@@ -124,22 +143,25 @@ for ii=1:amountWriting
     writing_y_Measurement = data.writing(ii).y;
     writing_z_Measurement = data.writing(ii).z;
     % Calculate mean
-    writing_x_mean = mean(writing_x_Measurement);
-    writing_y_mean = mean(writing_y_Measurement);
-    writing_z_mean = mean(writing_z_Measurement);
+%     writing_x_mean = mean(writing_x_Measurement);
+%     writing_y_mean = mean(writing_y_Measurement);
+%     writing_z_mean = mean(writing_z_Measurement);
     % Resultant array
     N = numel(writing_x_Measurement);
     writing_result = zeros(N,1);
     % Subtract mean from each value
     for jj=1:N
-        writing_x_Measurement(jj)=writing_x_Measurement(jj)-writing_x_mean;
-        writing_y_Measurement(jj)=writing_y_Measurement(jj)-writing_y_mean;
-        writing_z_Measurement(jj)=writing_z_Measurement(jj)-writing_z_mean;
+%         writing_x_Measurement(jj)=writing_x_Measurement(jj)-writing_x_mean;
+%         writing_y_Measurement(jj)=writing_y_Measurement(jj)-writing_y_mean;
+%         writing_z_Measurement(jj)=writing_z_Measurement(jj)-writing_z_mean;
         % Calculate resultant
         writing_result(jj) = sqrt(writing_x_Measurement(jj)^2 + writing_y_Measurement(jj)^2 + writing_z_Measurement(jj)^2);
     end
     mean_writing_result = mean(writing_result);
     writing_result = writing_result - mean_writing_result;
+    featureMatrix(7,ii) = mean(writing_result);
+    featureMatrix(8,ii) = std(writing_result);
+    featureMatrix(9,ii) = skewness(writing_result);
     % Plot resultant in 1 subplot
     subplot(4,4,ii)
     plot(writing_result)
@@ -155,36 +177,42 @@ for ii=1:amountShoe
     shoe_y_Measurement = data.shoe(ii).y;
     shoe_z_Measurement = data.shoe(ii).z;
     % Calculate mean
-    shoe_x_mean = mean(shoe_x_Measurement);
-    shoe_y_mean = mean(shoe_y_Measurement);
-    shoe_z_mean = mean(shoe_z_Measurement);
+%     shoe_x_mean = mean(shoe_x_Measurement);
+%     shoe_y_mean = mean(shoe_y_Measurement);
+%     shoe_z_mean = mean(shoe_z_Measurement);
     % Resultant array
     N = numel(shoe_x_Measurement);
     shoe_result = zeros(N,1);
     % Subtract mean from each value
     for jj=1:N
-        shoe_x_Measurement(jj)=shoe_x_Measurement(jj)-shoe_x_mean;
-        shoe_y_Measurement(jj)=shoe_y_Measurement(jj)-shoe_y_mean;
-        shoe_z_Measurement(jj)=shoe_z_Measurement(jj)-shoe_z_mean;
+%         shoe_x_Measurement(jj)=shoe_x_Measurement(jj)-shoe_x_mean;
+%         shoe_y_Measurement(jj)=shoe_y_Measurement(jj)-shoe_y_mean;
+%         shoe_z_Measurement(jj)=shoe_z_Measurement(jj)-shoe_z_mean;
         % Calculate resultant
         shoe_result(jj) = sqrt(shoe_x_Measurement(jj)^2 + shoe_y_Measurement(jj)^2 + shoe_z_Measurement(jj)^2);
     end
     mean_shoe_result = mean(shoe_result);
     shoe_result = shoe_result - mean_shoe_result;
+    % Time features
+    featureMatrix(10,ii) = mean(shoe_result);
+    featureMatrix(11,ii) = std(shoe_result);
+    featureMatrix(12,ii) = skewness(shoe_result);
     % Plot resultant in 1 subplot
     subplot(4,4,ii)
     plot(shoe_result)
     title(ii);
 end
 
+% Plot van alles
+% Class = [ones(amountDrinking,1);2*ones(amountBrush,1);3*ones(amountWriting,1);4*ones(amountShoe,1)];
+% ClassVector = rand(amountDrinking, 1) > 0.1;
+% featureMatrix;
+% gplotmatrix(featureMatrix, [],ClassVector);
 %% Feature extraction
 
 % Moet deze berekening niet per drinking_result in de lus gebeuren? Want
 % drinking_result wordt elke keer opnieuw gebruikt.
-% Time domain waardes.
-mean_amplitude = mean(drinking_result)
-std_amplitude = std(drinking_result)
-skewnessDrinking = skewness(drinking_result)
+
 
 %drinking
 Fs = 128;      %sample frequentie
