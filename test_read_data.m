@@ -261,6 +261,22 @@ ylabel('|singleSideSpectrum(f)|')
 %https://nl.mathworks.com/help/matlab/ref/scatter.html 
 
 
+%Nieuwe deel van de taak
+%% Decision Trees for Binary Classification
+% For illustration purpose use the 2 most discriminating features from the data exploration part. 
+% Each group selects one of the four activities it wants to detect. 
+% Use the binary classification approach one versus the rest to construct the decision tree. 
+% Construct a decision tree with the training data given in data.mat. 
+% You can use the instruction fitctree in MATLAB for this purpose. 
+% Also divide the feature space in the region of the positive instances and the region of the negative instances. 
+% Visualise also in the feature space the training instances. 
+% Plot the Receiver-Operating-Characteristic (ROC) and also calculate the area-under-the-curve (AUC).
+% Use for this purpose the MATLAB instructions perfcurve. 
+% The score is obtained by the MATLAB instruction resubPredict for trees. 
+% Also calculate the confusion matrix on the training set. Use for that the instruction confusionmat in MATLAB.  
+% Extract the accuracy of the binary classifier. 
+% Note that calculating performance measures on the training data gives too optimistic results (overfitting). 
+
 
 
 
