@@ -183,7 +183,6 @@ end
 Fs = 128;      %sample frequentie
 T = 1/Fs;       %sample periode
 L = numel(drinking_result);       %lengte van het signaal
-t = (0:L-1)*T;  %tijd vector
 
 Y = fft(drinking_result,L);
 twoSideSpectrum = abs(Y/L);
@@ -199,7 +198,6 @@ ylabel('|singleSideSpectrum(f)|')
 Fs = 128;      %sample frequentie
 T = 1/Fs;       %sample periode
 L = numel(brush_result);       %lengte van het signaal
-t = (0:L-1)*T;  %tijd vector
 
 Y = fft(brush_result,L);
 twoSideSpectrum = abs(Y/L);
@@ -216,7 +214,6 @@ ylabel('|singleSideSpectrum(f)|')
 Fs = 128;      %sample frequentie
 T = 1/Fs;       %sample periode
 L = numel(writing_result);       %lengte van het signaal
-t = (0:L-1)*T;  %tijd vector
 
 Y = fft(writing_result,L);
 twoSideSpectrum = abs(Y/L);
@@ -232,7 +229,6 @@ ylabel('|singleSideSpectrum(f)|')
 Fs = 128;      %sample frequentie
 T = 1/Fs;       %sample periode
 L = numel(shoe_result);       %lengte van het signaal
-t = (0:L-1)*T;  %tijd vector
 
 Y = fft(shoe_result,L);
 twoSideSpectrum = abs(Y/L);
