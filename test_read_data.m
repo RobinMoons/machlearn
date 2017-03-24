@@ -50,13 +50,12 @@ load('data.mat')
 %staan voor in het verslag, die man vind dat goed als ge u redenering laat
 %zien en we kunnen dat wel gebruiken. 
 
-
+featureMatrix = zeros(numel(data.drinking) + numel(data.brush) + numel(data.shoe) + numel(data.writing),3);
 
 % Calculate drinking
 figure('NumberTitle','off','Name','Drinking data')
 amountDrinking = numel(data.drinking);
-featureMatrix = zeros(amountDrinking,12);
-featureMatrixDrinking = zeros(amountDrinking, 3);
+
 for ii=1:amountDrinking
     % Get the x,y,z measurements
     drinking_x_Measurement = data.drinking(ii).x;
@@ -80,13 +79,9 @@ for ii=1:amountDrinking
     mean_drinking_result = mean(drinking_result);
     drinking_result = drinking_result - mean_drinking_result;
     % Time domain waardes.
-    featureMatrix(1,ii) = mean(drinking_result);
-    featureMatrix(2,ii) = std(drinking_result);
-    featureMatrix(3,ii) = skewness(drinking_result);
-    % Alleen van drinking
-    featureMatrixDrinking(1,ii) = mean(drinking_result);
-    featureMatrixDrinking(1,ii) = std(drinking_result);
-    featureMatrixDrinking(1,ii) = skewness(drinking_result);
+    featureMatrix(ii,1) = mean(drinking_result);
+    featureMatrix(ii,2) = std(drinking_result);
+    featureMatrix(ii,3) = skewness(drinking_result);
     % Plot resultant in 1 subplot
     subplot(4,4,ii)
     plot(drinking_result)
@@ -95,9 +90,9 @@ end
 
 % Class = [ones(amountDrinking,1);2*ones(amountBrush,1);3*ones(amountWriting,1);4*ones(amountShoe,1)];
 % Lijkt ook nog niet te werken
-ClassVector = rand(amountDrinking, 1) > 0.3;
-featureMatrix;
-gplotmatrix(featureMatrixDrinking, [],ClassVector);
+% ClassVector = rand(amountDrinking, 1) > 0.3;
+% featureMatrix;
+% gplotmatrix(featureMatrixDrinking, [],ClassVector);
 
 %% Calculate brushing
 figure('NumberTitle','off','Name','Brush data')
@@ -125,9 +120,9 @@ for ii=1:amountBrush
     mean_brush_result = mean(brush_result);
     brush_result = brush_result - mean_brush_result;
     % Time domain waardes.
-    featureMatrix(4,ii) = mean(brush_result);
-    featureMatrix(5,ii) = std(brush_result);
-    featureMatrix(6,ii) = skewness(brush_result);
+    featureMatrix(ii + amountDrinking,1) = mean(brush_result);
+    featureMatrix(ii + amountDrinking,2) = std(brush_result);
+    featureMatrix(ii + amountDrinking,3) = skewness(brush_result);
     % Plot resultant in 1 subplot
     subplot(4,4,ii)
     plot(brush_result)
@@ -159,9 +154,9 @@ for ii=1:amountWriting
     end
     mean_writing_result = mean(writing_result);
     writing_result = writing_result - mean_writing_result;
-    featureMatrix(7,ii) = mean(writing_result);
-    featureMatrix(8,ii) = std(writing_result);
-    featureMatrix(9,ii) = skewness(writing_result);
+    featureMatrix(ii+ amountDrinking + amountBrush,1) = mean(writing_result);
+    featureMatrix(ii+ amountDrinking + amountBrush,2) = std(writing_result);
+    featureMatrix(ii+ amountDrinking + amountBrush,3) = skewness(writing_result);
     % Plot resultant in 1 subplot
     subplot(4,4,ii)
     plot(writing_result)
@@ -194,9 +189,9 @@ for ii=1:amountShoe
     mean_shoe_result = mean(shoe_result);
     shoe_result = shoe_result - mean_shoe_result;
     % Time features
-    featureMatrix(10,ii) = mean(shoe_result);
-    featureMatrix(11,ii) = std(shoe_result);
-    featureMatrix(12,ii) = skewness(shoe_result);
+    featureMatrix(ii+ amountDrinking + amountBrush + amountWriting,1) = mean(shoe_result);
+    featureMatrix(ii+ amountDrinking + amountBrush + amountWriting,2) = std(shoe_result);
+    featureMatrix(ii+ amountDrinking + amountBrush + amountWriting,3) = skewness(shoe_result);
     % Plot resultant in 1 subplot
     subplot(4,4,ii)
     plot(shoe_result)
@@ -214,69 +209,69 @@ end
 % drinking_result wordt elke keer opnieuw gebruikt.
 
 
-%drinking
-Fs = 128;      %sample frequentie
-T = 1/Fs;       %sample periode
-L = numel(drinking_result);       %lengte van het signaal
-
-Y = fft(drinking_result,L);
-twoSideSpectrum = abs(Y/L);
-singleSideSpectrum = twoSideSpectrum(1:L/2+0);
-singleSideSpectrum(2:end-1) = 2*singleSideSpectrum(2:end-1);
-f = Fs*(0:(L/2)-1)/L;
-figure('NumberTitle','off','Name','Drinking FFT result'), plot(f,singleSideSpectrum)
-title('spectrum of the signal')
-xlabel('f (Hz)')
-ylabel('|singleSideSpectrum(f)|')
-% Percentile berekening.
-percentile25 = prctile(singleSideSpectrum,25);
-percintile75 = prctile(singleSideSpectrum,75);
-
-%brush
-Fs = 128;      %sample frequentie
-T = 1/Fs;       %sample periode
-L = numel(brush_result);       %lengte van het signaal
-
-Y = fft(brush_result,L);
-twoSideSpectrum = abs(Y/L);
-singleSideSpectrum = twoSideSpectrum(1:L/2+1);
-singleSideSpectrum(2:end-1) = 2*singleSideSpectrum(2:end-1);
-f = Fs*(0:(L/2))/L;
-figure('NumberTitle','off','Name','Brush FFT result'), plot(f,singleSideSpectrum)
-title('spectrum of the signal')
-xlabel('f (Hz)')
-ylabel('|singleSideSpectrum(f)|')
-
-
-%writing
-Fs = 128;      %sample frequentie
-T = 1/Fs;       %sample periode
-L = numel(writing_result);       %lengte van het signaal
-
-Y = fft(writing_result,L);
-twoSideSpectrum = abs(Y/L);
-singleSideSpectrum = twoSideSpectrum(1:L/2+1);
-singleSideSpectrum(2:end-1) = 2*singleSideSpectrum(2:end-1);
-f = Fs*(0:(L/2))/L;
-figure('NumberTitle','off','Name','Writing FFT result'), plot(f,singleSideSpectrum)
-title('spectrum of the signal')
-xlabel('f (Hz)')
-ylabel('|singleSideSpectrum(f)|')
-
-%Shoe
-Fs = 128;      %sample frequentie
-T = 1/Fs;       %sample periode
-L = numel(shoe_result);       %lengte van het signaal
-
-Y = fft(shoe_result,L);
-twoSideSpectrum = abs(Y/L);
-singleSideSpectrum = twoSideSpectrum(1:L/2+1);
-singleSideSpectrum(2:end-1) = 2*singleSideSpectrum(2:end-1);
-f = Fs*(0:(L/2))/L;
-figure('NumberTitle','off','Name','Shoe FFT result'), plot(f,singleSideSpectrum)
-title('spectrum of the signal')
-xlabel('f (Hz)')
-ylabel('|singleSideSpectrum(f)|')
+% %drinking
+% Fs = 128;      %sample frequentie
+% T = 1/Fs;       %sample periode
+% L = numel(drinking_result);       %lengte van het signaal
+% 
+% Y = fft(drinking_result,L);
+% twoSideSpectrum = abs(Y/L);
+% singleSideSpectrum = twoSideSpectrum(1:L/2+0);
+% singleSideSpectrum(2:end-1) = 2*singleSideSpectrum(2:end-1);
+% f = Fs*(0:(L/2)-1)/L;
+% figure('NumberTitle','off','Name','Drinking FFT result'), plot(f,singleSideSpectrum)
+% title('spectrum of the signal')
+% xlabel('f (Hz)')
+% ylabel('|singleSideSpectrum(f)|')
+% % Percentile berekening.
+% percentile25 = prctile(singleSideSpectrum,25);
+% percintile75 = prctile(singleSideSpectrum,75);
+% 
+% %brush
+% Fs = 128;      %sample frequentie
+% T = 1/Fs;       %sample periode
+% L = numel(brush_result);       %lengte van het signaal
+% 
+% Y = fft(brush_result,L);
+% twoSideSpectrum = abs(Y/L);
+% singleSideSpectrum = twoSideSpectrum(1:L/2+1);
+% singleSideSpectrum(2:end-1) = 2*singleSideSpectrum(2:end-1);
+% f = Fs*(0:(L/2))/L;
+% figure('NumberTitle','off','Name','Brush FFT result'), plot(f,singleSideSpectrum)
+% title('spectrum of the signal')
+% xlabel('f (Hz)')
+% ylabel('|singleSideSpectrum(f)|')
+% 
+% 
+% %writing
+% Fs = 128;      %sample frequentie
+% T = 1/Fs;       %sample periode
+% L = numel(writing_result);       %lengte van het signaal
+% 
+% Y = fft(writing_result,L);
+% twoSideSpectrum = abs(Y/L);
+% singleSideSpectrum = twoSideSpectrum(1:L/2+1);
+% singleSideSpectrum(2:end-1) = 2*singleSideSpectrum(2:end-1);
+% f = Fs*(0:(L/2))/L;
+% figure('NumberTitle','off','Name','Writing FFT result'), plot(f,singleSideSpectrum)
+% title('spectrum of the signal')
+% xlabel('f (Hz)')
+% ylabel('|singleSideSpectrum(f)|')
+% 
+% %Shoe
+% Fs = 128;      %sample frequentie
+% T = 1/Fs;       %sample periode
+% L = numel(shoe_result);       %lengte van het signaal
+% 
+% Y = fft(shoe_result,L);
+% twoSideSpectrum = abs(Y/L);
+% singleSideSpectrum = twoSideSpectrum(1:L/2+1);
+% singleSideSpectrum(2:end-1) = 2*singleSideSpectrum(2:end-1);
+% f = Fs*(0:(L/2))/L;
+% figure('NumberTitle','off','Name','Shoe FFT result'), plot(f,singleSideSpectrum)
+% title('spectrum of the signal')
+% xlabel('f (Hz)')
+% ylabel('|singleSideSpectrum(f)|')
 
 
 %Time domain:
@@ -294,6 +289,15 @@ ylabel('|singleSideSpectrum(f)|')
 %info voor scattered plot
 %https://nl.mathworks.com/help/matlab/ref/scatter.html 
 
+% for i = 1:numel(data.drinking)
+%     feat = featureMatrix(data.drinking(i));
+%     X1 = vertcat(X1, feat);
+% end
+
+%training data
+%X = [X1; X2; X3; X4];
+Class = [ones(amountDrinking,1);2*ones(amountBrush + amountShoe + amountWriting,1)];
+figure, gplotmatrix(featureMatrix,[],Class)
 
 %Nieuwe deel van de taak
 %% Decision Trees for Binary Classification
