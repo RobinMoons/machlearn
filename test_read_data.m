@@ -71,10 +71,10 @@ for ii=1:amountDrinking
     
     Fs = 128;      %sample frequentie
     T = 1/Fs;       %sample periode
-    L = numel(drinking_result);       %lengte van het signaal
+    L = 1500;       %lengte van het signaal
     Y = fft(drinking_result,L);
     twoSideSpectrum = abs(Y/L);
-    singleSideSpectrum = twoSideSpectrum(1:L/2+0);
+    singleSideSpectrum = twoSideSpectrum(1:L/2);
     singleSideSpectrum(2:end-1) = 2*singleSideSpectrum(2:end-1);
     f = Fs*(0:(L/2)-1)/L;
     % figure('NumberTitle','off','Name','Drinking FFT result'), plot(f,singleSideSpectrum)
@@ -123,10 +123,10 @@ for ii=1:amountBrush
     title(ii);
     Fs = 128;      %sample frequentie
     T = 1/Fs;       %sample periode
-    L = numel(brush_result);       %lengte van het signaal    
+    L = 1500;       %lengte van het signaal    
     Y = fft(brush_result,L);
     twoSideSpectrum = abs(Y/L);
-    singleSideSpectrum = twoSideSpectrum(1:L/2+1);
+    singleSideSpectrum = twoSideSpectrum(1:L/2);
     singleSideSpectrum(2:end-1) = 2*singleSideSpectrum(2:end-1);
 %     f = Fs*(0:(L/2))/L;
 %     figure('NumberTitle','off','Name','Writing FFT result'), plot(f,singleSideSpectrum)
@@ -173,10 +173,10 @@ for ii=1:amountWriting
     title(ii);
     Fs = 128;      %sample frequentie
     T = 1/Fs;       %sample periode
-    L = numel(writing_result);       %lengte van het signaal    
+    L = 1500;       %lengte van het signaal    
     Y = fft(writing_result,L);
     twoSideSpectrum = abs(Y/L);
-    singleSideSpectrum = twoSideSpectrum(1:L/2+1);
+    singleSideSpectrum = twoSideSpectrum(1:L/2);
     singleSideSpectrum(2:end-1) = 2*singleSideSpectrum(2:end-1);
 %     f = Fs*(0:(L/2))/L;
 %     figure('NumberTitle','off','Name','Writing FFT result'), plot(f,singleSideSpectrum)
@@ -225,11 +225,11 @@ for ii=1:amountShoe
     
     Fs = 128;      %sample frequentie
     T = 1/Fs;       %sample periode
-    L = numel(shoe_result);       %lengte van het signaal
+    L = 1500;       %lengte van het signaal
 
     Y = fft(shoe_result,L);
     twoSideSpectrum = abs(Y/L);
-    singleSideSpectrum = twoSideSpectrum(1:L/2+1);
+    singleSideSpectrum = twoSideSpectrum(1:L/2);
     singleSideSpectrum(2:end-1) = 2*singleSideSpectrum(2:end-1);
     f = Fs*(0:(L/2))/L;
 %     figure('NumberTitle','off','Name','Shoe FFT result'), plot(f,singleSideSpectrum)
