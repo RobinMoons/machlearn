@@ -282,8 +282,72 @@ figure, gplotmatrix(featureMatrix,[],Class)
 % Extract the accuracy of the binary classifier. 
 % Note that calculating performance measures on the training data gives too optimistic results (overfitting). 
 
+% Aantal elementen in de array / aantal features
+n = numel(featureMatrix) / 5;
+% Code vanuit voorbeeld -> gaat out of bounds
+%p = randperm(2*n)
+% deze werkt wel
+p = randperm(n);
+% Hier ook 2*n verwijderd
+Xte = featureMatrix(p(n+1:n),:);
+Clte = Class(p(n+1:n));
+%Training set 50% of data
+Xtr = featureMatrix(p(1:n),:);
+Cltr = Class(p(1:n));
 
+%help fitctree
+Mdl = fitctree(Xtr(:,1:2),Cltr);
+view(Mdl)
+view(Mdl,'Mode','graph')
 
+% Code van het voorbeeld -> Geeft conversion error omdat de waardes allemaal doubles zijn 
+% View feature space split in two classes
+% %help meshgrid
+% d = 0.01;
+% [x1Grid,x2Grid] = meshgrid(min(Xtr(:,1)):d:max(Xtr(:,1)),...
+%     min(Xtr(:,2)):d:max(Xtr(:,2)));
+% xGrid = [x1Grid(:),x2Grid(:)];
+% labels = predict(Mdl,xGrid);
+% 
+% % Training data points
+% figure
+% h(1:2) = gscatter(xGrid(:,1),xGrid(:,2),labels,[0.1 0.5 0.5; 0.5 0.1 0.5 ]);
+% hold on
+% h(3:4) = gscatter(Xtr(:,1),Xtr(:,2),Cltr);
+% legend(h,{'Class1','Class2','Class1 Tr','Class2 Tr'},...
+%    'Location','Northwest');
+% xlabel('x1');
+% ylabel('x2');
+% 
+% % Testing data points
+% figure 
+% 
+% h(1:2) = gscatter(xGrid(:,1),xGrid(:,2),labels,[0.1 0.5 0.5; 0.5 0.1 0.5 ]);
+% hold on
+% h(3:4) = gscatter(Xte(:,1),Xte(:,2),Clte);
+% legend(h,{'Class1','Class2','Class1 Te','Class2 Te'},...
+%    'Location','Northwest');
+% xlabel('x1');
+% ylabel('x2');
+% 
+% % ROC curve one vs one
+% % help resubPredict
+% % [~,score] = resubPredict(Mdl);
+% % Class1 vs Class2
+% %help perfcurve
+% [fpr,tpr,T,AUC,OPTROCPT] = perfcurve(Cltr,score(:,1),1);
+% figure
+% plot(fpr,tpr)
+% hold on
+% plot(OPTROCPT(1),OPTROCPT(2),'ro')
+% xlabel('False positive rate')
+% ylabel('True positive rate')
+% title('ROC Curve for Classification by Classification Trees')
+% hold off
+% 
+% % Data preparation for classification app
+% 
+% Y = [featureMatrix Class];
 
 
 
