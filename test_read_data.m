@@ -282,23 +282,30 @@ figure, gplotmatrix(featureMatrix,[],Class)
 % Extract the accuracy of the binary classifier. 
 % Note that calculating performance measures on the training data gives too optimistic results (overfitting). 
 
-% Aantal elementen in de array / aantal features
-n = numel(featureMatrix) / 5;
-% Code vanuit voorbeeld -> gaat out of bounds
-%p = randperm(2*n)
-% deze werkt wel
-p = randperm(n);
-% Hier ook 2*n verwijderd
-Xte = featureMatrix(p(n+1:n),:);
-Clte = Class(p(n+1:n));
-%Training set 50% of data
-Xtr = featureMatrix(p(1:n),:);
-Cltr = Class(p(1:n));
+%% Overbodig 
+% % Aantal elementen in de array / aantal features
+% n = numel(featureMatrix) / 5;
+% % Code vanuit voorbeeld -> gaat out of bounds
+% %p = randperm(2*n)
+% % deze werkt wel
+% p = randperm(n);
+% % Hier ook 2*n verwijderd
+% Xte = featureMatrix(p(n+1:n),:);
+% Clte = Class(p(n+1:n));
+% %Training set 50% of data
+% Xtr = featureMatrix(p(1:n),:);
+% Cltr = Class(p(1:n));
 
 %help fitctree
-Mdl = fitctree(Xtr(:,1:2),Cltr);
-view(Mdl)
-view(Mdl,'Mode','graph')
+%Mdl = fitctree(Xtr(:,1:2),Cltr);
+
+%% tree maken
+tree = fitctree(featureMatrix, Class);
+view(tree)
+view(tree,'Mode','graph')
+
+%%
+% die voorbeeldcode daar heeft die eerst nog data moeten genereren enzo
 
 % Code van het voorbeeld -> Geeft conversion error omdat de waardes allemaal doubles zijn 
 % View feature space split in two classes
