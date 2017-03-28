@@ -2,7 +2,11 @@ close all;
 clear all;
 clc;
 
-load('data.mat')
+testdata = load('testDataDetection.mat');
+testdata = testdata.data;
+data = load('data.mat');
+data = data.data;
+
 
 
 %%create featureMatrix
@@ -206,6 +210,20 @@ figure, gplotmatrix(featureMatrix,[],Class)
 tree = fitctree(featureMatrix, Class);
 view(tree)
 view(tree,'Mode','graph')
+% Dit is niet nodig, de volledige featureMatrix kiest zelf al feature 4 en 5 uit.
+% selectedFeatures = featureMatrix(: , 4:5);
+% view(selectedTree)
+% view(selectedTree,'Mode','graph')
+% selectedTree = fitctree(selectedFeatures, Class);
+
+%% Accuracy on trainings data
+%help resubPredict
+[Cpred_tr,score,node] = resubPredict(tree);
+%help confusionmat
+C = confusionmat(Class,Cpred_tr)
+accuracy = trace(C)/sum(sum(C))
+
+
 
 % Also divide the feature space in the region of the positive instances and the region of the negative instances. 
 % Visualise also in the feature space the training instances. 
@@ -215,72 +233,3 @@ view(tree,'Mode','graph')
 % Also calculate the confusion matrix on the training set. Use for that the instruction confusionmat in MATLAB.  
 % Extract the accuracy of the binary classifier. 
 % Note that calculating performance measures on the training data gives too optimistic results (overfitting). 
-
-
-
-
-%%
-% die voorbeeldcode daar heeft die eerst nog data moeten genereren enzo
-
-% Code van het voorbeeld -> Geeft conversion error omdat de waardes allemaal doubles zijn 
-% View feature space split in two classes
-% %help meshgrid
-% d = 0.01;
-% [x1Grid,x2Grid] = meshgrid(min(Xtr(:,1)):d:max(Xtr(:,1)),...
-%     min(Xtr(:,2)):d:max(Xtr(:,2)));
-% xGrid = [x1Grid(:),x2Grid(:)];
-% labels = predict(Mdl,xGrid);
-% 
-% % Training data points
-% figure
-% h(1:2) = gscatter(xGrid(:,1),xGrid(:,2),labels,[0.1 0.5 0.5; 0.5 0.1 0.5 ]);
-% hold on
-% h(3:4) = gscatter(Xtr(:,1),Xtr(:,2),Cltr);
-% legend(h,{'Class1','Class2','Class1 Tr','Class2 Tr'},...
-%    'Location','Northwest');
-% xlabel('x1');
-% ylabel('x2');
-% 
-% % Testing data points
-% figure 
-% 
-% h(1:2) = gscatter(xGrid(:,1),xGrid(:,2),labels,[0.1 0.5 0.5; 0.5 0.1 0.5 ]);
-% hold on
-% h(3:4) = gscatter(Xte(:,1),Xte(:,2),Clte);
-% legend(h,{'Class1','Class2','Class1 Te','Class2 Te'},...
-%    'Location','Northwest');
-% xlabel('x1');
-% ylabel('x2');
-% 
-% % ROC curve one vs one
-% % help resubPredict
-% % [~,score] = resubPredict(Mdl);
-% % Class1 vs Class2
-% %help perfcurve
-% [fpr,tpr,T,AUC,OPTROCPT] = perfcurve(Cltr,score(:,1),1);
-% figure
-% plot(fpr,tpr)
-% hold on
-% plot(OPTROCPT(1),OPTROCPT(2),'ro')
-% xlabel('False positive rate')
-% ylabel('True positive rate')
-% title('ROC Curve for Classification by Classification Trees')
-% hold off
-% 
-% % Data preparation for classification app
-% 
-% Y = [featureMatrix Class];
-
-
-
-
-
-
-
-
-
-
-
-
-
-
