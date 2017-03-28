@@ -61,7 +61,7 @@ for ii=1:amountDrinking
     mean_drinking_result = mean(drinking_result);
     drinking_result = drinking_result - mean_drinking_result;
     % Time domain waardes.
-    featureMatrix(ii,1) = mean(drinking_result);
+    featureMatrix(ii,1) = mean_drinking_result;
 %     featureMatrix(ii,1) = mean_drinking_result;
     featureMatrix(ii,2) = std(drinking_result);
     featureMatrix(ii,3) = skewness(drinking_result);
@@ -83,8 +83,13 @@ for ii=1:amountDrinking
     % xlabel('f (Hz)')
     % ylabel('|singleSideSpectrum(f)|')
     % Percentile berekening.
-    percentile25 = prctile(singleSideSpectrum,25);
-    percentile75 = prctile(singleSideSpectrum,75);
+    
+    cumsum25 = cumsum(singleSideSpectrum.^2)/sum(singleSideSpectrum.^2);    
+    index25 = find(cumsum25 >= 0.25, 1, 'first');
+    percentile25 = f(index25);
+    cumsum75 = cumsum(singleSideSpectrum.^2)/sum(singleSideSpectrum.^2);
+    index75 = find(cumsum75 >= 0.75, 1, 'first');
+    percentile75 = f(index75);
     featureMatrix(ii,4) = percentile25;
     featureMatrix(ii,5) = percentile75;
 end
@@ -115,7 +120,7 @@ for ii=1:amountBrush
     mean_brush_result = mean(brush_result);
     brush_result = brush_result - mean_brush_result;
     % Time domain waardes.
-    featureMatrix(ii + amountDrinking,1) = mean(brush_result);
+    featureMatrix(ii + amountDrinking,1) = mean_brush_result;
 %     featureMatrix(ii + amountDrinking,1) = mean_brush_result;
     featureMatrix(ii + amountDrinking,2) = std(brush_result);
     featureMatrix(ii + amountDrinking,3) = skewness(brush_result);
@@ -135,8 +140,12 @@ for ii=1:amountBrush
 %     title('spectrum of the signal')
 %     xlabel('f (Hz)')
 %     ylabel('|singleSideSpectrum(f)|')
-    percentile25 = prctile(singleSideSpectrum,25);
-    percentile75 = prctile(singleSideSpectrum,75);
+    cumsum25 = cumsum(singleSideSpectrum.^2)/sum(singleSideSpectrum.^2);    
+    index25 = find(cumsum25 >= 0.25, 1, 'first');
+    percentile25 = f(index25);
+    cumsum75 = cumsum(singleSideSpectrum.^2)/sum(singleSideSpectrum.^2);
+    index75 = find(cumsum75 >= 0.75, 1, 'first');
+    percentile75 = f(index75);
     featureMatrix(ii + amountDrinking, 4) = percentile25;
     featureMatrix(ii + amountDrinking, 5) = percentile75;
 end
@@ -166,7 +175,7 @@ for ii=1:amountWriting
     end
     mean_writing_result = mean(writing_result);
     writing_result = writing_result - mean_writing_result;
-    featureMatrix(ii+ amountDrinking + amountBrush,1) = mean(writing_result);
+    featureMatrix(ii+ amountDrinking + amountBrush,1) = mean_writing_result;
 %     featureMatrix(ii+ amountDrinking + amountBrush,1) = mean_writing_result;
     featureMatrix(ii+ amountDrinking + amountBrush,2) = std(writing_result);
     featureMatrix(ii+ amountDrinking + amountBrush,3) = skewness(writing_result);
@@ -186,8 +195,12 @@ for ii=1:amountWriting
 %     title('spectrum of the signal')
 %     xlabel('f (Hz)')
 %     ylabel('|singleSideSpectrum(f)|')
-    percentile25 = prctile(singleSideSpectrum,25);
-    percentile75 = prctile(singleSideSpectrum,75);
+    cumsum25 = cumsum(singleSideSpectrum.^2)/sum(singleSideSpectrum.^2);    
+    index25 = find(cumsum25 >= 0.25, 1, 'first');
+    percentile25 = f(index25);
+    cumsum75 = cumsum(singleSideSpectrum.^2)/sum(singleSideSpectrum.^2);
+    index75 = find(cumsum75 >= 0.75, 1, 'first');
+    percentile75 = f(index75);
     featureMatrix(ii + amountDrinking + amountBrush,4) = percentile25;
     featureMatrix(ii + amountDrinking + amountBrush,5) = percentile75;
 end
@@ -218,7 +231,7 @@ for ii=1:amountShoe
     mean_shoe_result = mean(shoe_result);
     shoe_result = shoe_result - mean_shoe_result;
     % Time features
-    featureMatrix(ii+ amountDrinking + amountBrush + amountWriting,1) = mean(shoe_result);
+    featureMatrix(ii+ amountDrinking + amountBrush + amountWriting,1) = mean_shoe_result;
 %     featureMatrix(ii+ amountDrinking + amountBrush + amountWriting,1) = mean_shoe_result;
     featureMatrix(ii+ amountDrinking + amountBrush + amountWriting,2) = std(shoe_result);
     featureMatrix(ii+ amountDrinking + amountBrush + amountWriting,3) = skewness(shoe_result);
@@ -240,14 +253,15 @@ for ii=1:amountShoe
 %     title('spectrum of the signal')
 %     xlabel('f (Hz)')
 %     ylabel('|singleSideSpectrum(f)|')
-    percentile25 = prctile(singleSideSpectrum,25);
-    percentile75 = prctile(singleSideSpectrum,75);
+    cumsum25 = cumsum(singleSideSpectrum.^2)/sum(singleSideSpectrum.^2);    
+    index25 = find(cumsum25 >= 0.25, 1, 'first');
+    percentile25 = f(index25);
+    cumsum75 = cumsum(singleSideSpectrum.^2)/sum(singleSideSpectrum.^2);
+    index75 = find(cumsum75 >= 0.75, 1, 'first');
+    percentile75 = f(index75);
     featureMatrix(ii + amountDrinking + amountBrush + amountWriting,4) = percentile25;
     featureMatrix(ii + amountDrinking + amountBrush + amountWriting,5) = percentile75;
 end
-
-
-
 
 
 %Time domain:
