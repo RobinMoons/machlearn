@@ -83,7 +83,7 @@ xGrid = [x1Grid(:),x2Grid(:)];
 
 %% Accuracy on test data
 %help confusionmat
-Cpred = predict(SVMModel,Xte(:,1:2));
+[Cpred,score] = predict(SVMModel,Xte(:,1:2));
 C = confusionmat(Clte,Cpred)
 accuracy = trace(C)/sum(sum(C))
 
@@ -125,7 +125,7 @@ ylabel('x2');
 % [~,score] = resubPredict(Mdl);
 % Class1 vs Class2
 %help perfcurve
-[fpr,tpr,T,AUC,OPTROCPT] = perfcurve(Cltr,score(:,1),1);
+[fpr,tpr,T,AUC,OPTROCPT] = perfcurve(Clte,score(:,1),1);
 AUC
 figROC=figure
 plot(fpr,tpr,'.-')
@@ -133,7 +133,7 @@ hold on
 plot(OPTROCPT(1),OPTROCPT(2),'ro')
 xlabel('False positive rate')
 ylabel('True positive rate')
-title('ROC Curve for Classification by Classification Trees')
+title('ROC Curve for Classification by Classification SVM linear')
 
 
 
@@ -160,7 +160,7 @@ xGrid = [x1Grid(:),x2Grid(:)];
 %% Accuracy on test data
 %help confusionmat
 
-Cpred = predict(SVMModel,Xte(:,1:2));
+[Cpred,score] = predict(SVMModel,Xte(:,1:2));
 C = confusionmat(Clte,Cpred)
 accuracy = trace(C)/sum(sum(C))
 
@@ -202,7 +202,7 @@ ylabel('x2');
 % [~,score] = resubPredict(Mdl);
 % Class1 vs Class2
 %help perfcurve
-[fpr,tpr,T,AUC,OPTROCPT] = perfcurve(Cltr,score(:,1),1);
+[fpr,tpr,T,AUC,OPTROCPT] = perfcurve(Clte,score(:,1),1);
 AUC
 figure(figROC)
 plot(fpr,tpr,'.-')
@@ -237,7 +237,7 @@ xGrid = [x1Grid(:),x2Grid(:)];
 %% Accuracy on test data
 %help confusionmat
 
-Cpred = predict(SVMModel,Xte(:,1:2));
+[Cpred,score] = predict(SVMModel,Xte(:,1:2));
 C = confusionmat(Clte,Cpred)
 accuracy = trace(C)/sum(sum(C))
 
@@ -279,7 +279,7 @@ ylabel('x2');
 % [~,score] = resubPredict(Mdl);
 % Class1 vs Class2
 %help perfcurve
-[fpr,tpr,T,AUC,OPTROCPT] = perfcurve(Cltr,score(:,1),1);
+[fpr,tpr,T,AUC,OPTROCPT] = perfcurve(Clte,score(:,1),1);
 AUC
 figure(figROC)
 plot(fpr,tpr,'.-')
