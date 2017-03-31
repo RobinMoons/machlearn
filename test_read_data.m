@@ -58,7 +58,7 @@ data = data.data;
 %     featureMatrix(ii,5) = percentile75;
 % end
 
-%% Calculate brushing
+% Calculate brushing
 
 % figure('NumberTitle','off','Name','Brush data')
 % amountBrush = numel(data.brush);
@@ -103,7 +103,7 @@ data = data.data;
 %     featureMatrix(ii + amountDrinking, 5) = percentile75;
 % end
 
-%% Calculate writing
+% Calculate writing
 
 % figure('NumberTitle','off','Name','Writing data')
 % amountWriting = numel(data.writing);
@@ -146,7 +146,7 @@ data = data.data;
 %     featureMatrix(ii + amountDrinking + amountBrush,5) = percentile75;
 % end
 
-%% Calculate Shoe
+% Calculate Shoe
 
 % amountShoe = numel(data.shoe);
 % figure('NumberTitle','off','Name','Shoe data')
@@ -198,7 +198,7 @@ drinkingFeature = featureExtraction(data.drinking);
 brushingFeature = featureExtraction(data.brush);
 writingFeature = featureExtraction(data.writing);
 shoeFeature = featureExtraction(data.shoe);
-featureMatrix = [drinkingFeature; brushingFeature; writingFeature; shoeFeature]
+featureMatrix = [drinkingFeature; brushingFeature; writingFeature; shoeFeature];
 
 %% Scatter plots van de features
 amountDrinking = numel(data.drinking);
@@ -234,6 +234,58 @@ view(tree,'Mode','graph')
 %help confusionmat
 C = confusionmat(Class,Cpred_tr)
 accuracy = trace(C)/sum(sum(C))
+
+
+%% Inlezen testdata
+testDataX = testdata.AthensTest_Accel_LN_X_CAL;
+testDataY = testdata.AthensTest_Accel_LN_Y_CAL;
+testDataZ = testdata.AthensTest_Accel_LN_Z_CAL;
+testDataTime = testdata.AthensTest_Timestamp_Unix_CAL;
+testDataLabel = testdata.Label;
+plot(testDataTime,testDataLabel)
+
+testDataSize = numel(testDataTime);
+% Verdeling moet nog beter gebeuren, nu wordt de laatste kolom gevuld met
+% nullen.
+seg_length = round(testDataSize/80, -2);
+% Elke Seg matrix heeft per kolom 1 data segmentatie.
+timeSeg = zeros(seg_length,ceil(testDataSize/seg_length));
+timeSeg(1:testDataSize) = testDataTime(:);
+labelSeg = zeros(seg_length,ceil(testDataSize/seg_length));
+labelSeg(1:testDataSize) = testDataTime(:);
+xSeg = zeros(seg_length,ceil(testDataSize/seg_length));
+xSeg(1:testDataSize) = testDataTime(:);
+ySeg = zeros(seg_length,ceil(testDataSize/seg_length));
+ySeg(1:testDataSize) = testDataTime(:);
+zSeg = zeros(seg_length,ceil(testDataSize/seg_length));
+zSeg(1:testDataSize) = testDataTime(:);
+
+
+% Verwerken data
+koloms = numel(timeSeg)/seg_length;
+testFeatureMatrix = zeros(koloms, 5);
+for ii=1:koloms
+    % Feature extraction: 
+    tempFeatureMatrix = testFeatureExtraction(xSeg(:,ii), ySeg(:,ii), zSeg(:,ii));
+    testFeatureMatrix(ii,1) = tempFeatureMatrix(1,1);
+    testFeatureMatrix(ii,2) = tempFeatureMatrix(1,2);
+    testFeatureMatrix(ii,3) = tempFeatureMatrix(1,3);
+    testFeatureMatrix(ii,4) = tempFeatureMatrix(1,4);
+    testFeatureMatrix(ii,5) = tempFeatureMatrix(1,5);
+end
+
+%% Test desicion tree
+Cpred = predict(tree,testFeatureMatrix);
+% van vb Clte = Class(p(n+1:2*n));
+% Deze getallen gebruikt omdat de som 81 is wat gelijk is aan het aantal
+% rijen van de testFeatureMatrix omdat de class van trainingsdata ook
+% gelijk is aantal rijen featurematrix.
+ClassTest = [ones(21,1);2*ones(20 + 20 + 20,1)];
+Clte = ClassTest;
+% Accurcy
+C = confusionmat(Clte,Cpred)
+accuracy = trace(C)/sum(sum(C))
+
 
 
 

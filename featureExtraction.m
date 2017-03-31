@@ -26,10 +26,6 @@ for ii=1:rows
 %     featureMatrix(ii,1) = mean_result;
     featureMatrix(ii,2) = std(result);
     featureMatrix(ii,3) = skewness(result);
-    % Plot resultant in 1 subplot
-    subplot(4,4,ii)
-    plot(result)
-    title(ii);
     
     Fs = 128;      %sample frequentie
     T = 1/Fs;       %sample periode
