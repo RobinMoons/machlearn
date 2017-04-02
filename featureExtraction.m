@@ -23,7 +23,6 @@ for ii=1:rows
     result = result - mean_result;
     % Time domain waardes.
     featureMatrix(ii,1) = mean_result;
-%     featureMatrix(ii,1) = mean_result;
     featureMatrix(ii,2) = std(result);
     featureMatrix(ii,3) = skewness(result);
     
