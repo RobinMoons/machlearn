@@ -83,13 +83,13 @@ seg_length = round(testDataSize/80, -2);
 timeSeg = zeros(seg_length,ceil(testDataSize/seg_length));
 timeSeg(1:testDataSize) = testDataTime(:);
 labelSeg = zeros(seg_length,ceil(testDataSize/seg_length));
-labelSeg(1:testDataSize) = testDataTime(:);
+labelSeg(1:testDataSize) = testDataLabel(:);
 xSeg = zeros(seg_length,ceil(testDataSize/seg_length));
-xSeg(1:testDataSize) = testDataTime(:);
+xSeg(1:testDataSize) = testDataX(:);
 ySeg = zeros(seg_length,ceil(testDataSize/seg_length));
-ySeg(1:testDataSize) = testDataTime(:);
+ySeg(1:testDataSize) = testDataY(:);
 zSeg = zeros(seg_length,ceil(testDataSize/seg_length));
-zSeg(1:testDataSize) = testDataTime(:);
+zSeg(1:testDataSize) = testDataZ(:);
 
 
 % Verwerken data
