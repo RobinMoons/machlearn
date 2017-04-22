@@ -12,8 +12,11 @@ drinkingFeature = featureExtraction(data.drinking);
 brushingFeature = featureExtraction(data.brush);
 writingFeature = featureExtraction(data.writing);
 shoeFeature = featureExtraction(data.shoe);
-featureMatrix = [drinkingFeature; brushingFeature; writingFeature; shoeFeature];
-
+col1 = [drinkingFeature(:,4); brushingFeature(:,4); writingFeature(:,4); shoeFeature(:,4)];
+col2 = [drinkingFeature(:,5); brushingFeature(:,5); writingFeature(:,5); shoeFeature(:,5)];
+featureMatrix = [col1,col2];
+%TestfeatureMatrix = featureMatrix';
+   
 %% Scatter plots van de features
 amountDrinking = numel(data.drinking);
 amountBrush = numel(data.brush);
@@ -42,6 +45,18 @@ view(tree,'Mode','graph')
 % view(selectedTree)
 % view(selectedTree,'Mode','graph')
 % selectedTree = fitctree(selectedFeatures, Class);
+
+%% Visualisation of results
+d = 0.01;
+[x1Grid,x2Grid] = meshgrid(min(featureMatrix(:,1)):d:max(featureMatrix(:,1)),min(featureMatrix(:,2)):d:max(featureMatrix(:,2)));
+xGrid = [x1Grid(:),x2Grid(:)];
+labels = predict(tree,xGrid);
+figure, h(1:2) = gscatter(xGrid(:,1),xGrid(:,2),labels,[0.1 0.5 0.5; 0.5 0.1 0.5 ]);
+hold on
+h(3:4) = gscatter(featureMatrix(:,1),featureMatrix(:,2),Class);
+legend(h,{'Class1','Class2','Class1 Tr','Class2 Tr'},'Location','Northwest');
+xlabel('x1');
+ylabel('x2');
 
 %% Accuracy on trainings data
 %help resubPredict
@@ -78,16 +93,18 @@ zSeg(1:testDataSize) = testDataTime(:);
 
 
 % Verwerken data
-koloms = numel(timeSeg)/seg_length;
-testFeatureMatrix = zeros(koloms, 5);
-for ii=1:koloms
+rows = numel(timeSeg)/seg_length;
+testFeatureMatrix = zeros(rows, 2);
+for ii=1:rows
     % Feature extraction: 
     tempFeatureMatrix = testFeatureExtraction(xSeg(:,ii), ySeg(:,ii), zSeg(:,ii));
-    testFeatureMatrix(ii,1) = tempFeatureMatrix(1,1);
-    testFeatureMatrix(ii,2) = tempFeatureMatrix(1,2);
-    testFeatureMatrix(ii,3) = tempFeatureMatrix(1,3);
-    testFeatureMatrix(ii,4) = tempFeatureMatrix(1,4);
-    testFeatureMatrix(ii,5) = tempFeatureMatrix(1,5);
+    testFeatureMatrix(ii,1) = tempFeatureMatrix(1,4);
+    testFeatureMatrix(ii,2) = tempFeatureMatrix(1,5);
+    %testFeatureMatrix(ii,1) = tempFeatureMatrix(1,1);
+    %testFeatureMatrix(ii,2) = tempFeatureMatrix(1,2);
+    %testFeatureMatrix(ii,3) = tempFeatureMatrix(1,3);
+    %testFeatureMatrix(ii,4) = tempFeatureMatrix(1,4);
+    %testFeatureMatrix(ii,5) = tempFeatureMatrix(1,5);
 end
 
 %% Test desicion tree
