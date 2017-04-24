@@ -65,54 +65,75 @@ ylabel('x2');
 C = confusionmat(Class,Cpred_tr)
 accuracyTraingData = trace(C)/sum(sum(C))
 
+%%
+%%dit is verkeerd, we moeten niet met tijdsegmenatie werken maar de
+%%segmentatie moet gebeuren met de labels
 
-%% Inlezen testdata
-testDataX = testdata.AthensTest_Accel_LN_X_CAL;
-testDataY = testdata.AthensTest_Accel_LN_Y_CAL;
-testDataZ = testdata.AthensTest_Accel_LN_Z_CAL;
-testDataTime = testdata.AthensTest_Timestamp_Unix_CAL;
+% testDataSize = numel(testDataTime);
+% % Verdeling moet nog beter gebeuren, nu wordt de laatste kolom gevuld met
+% % nullen.
+% seg_length = round(testDataSize/80, -2);
+% % Elke Seg matrix heeft per kolom 1 data segmentatie.
+% timeSeg = zeros(seg_length,ceil(testDataSize/seg_length));
+% timeSeg(1:testDataSize) = testDataTime(:);
+% labelSeg = zeros(seg_length,ceil(testDataSize/seg_length));
+% labelSeg(1:testDataSize) = testDataLabel(:);
+% xSeg = zeros(seg_length,ceil(testDataSize/seg_length));
+% xSeg(1:testDataSize) = testDataX(:);
+% ySeg = zeros(seg_length,ceil(testDataSize/seg_length));
+% ySeg(1:testDataSize) = testDataY(:);
+% zSeg = zeros(seg_length,ceil(testDataSize/seg_length));
+% zSeg(1:testDataSize) = testDataZ(:);
+
+
+%%
+%data segmentatie
+
+vorige = -1;
+tellerMeetpunt = 0;
+activiteitenTeller = 0;
 testDataLabel = testdata.Label;
-figure, plot(testDataTime,testDataLabel)
-title('test Data')
-
-testDataSize = numel(testDataTime);
-% Verdeling moet nog beter gebeuren, nu wordt de laatste kolom gevuld met
-% nullen.
-seg_length = round(testDataSize/80, -2);
-% Elke Seg matrix heeft per kolom 1 data segmentatie.
-timeSeg = zeros(seg_length,ceil(testDataSize/seg_length));
-timeSeg(1:testDataSize) = testDataTime(:);
-labelSeg = zeros(seg_length,ceil(testDataSize/seg_length));
-labelSeg(1:testDataSize) = testDataLabel(:);
-xSeg = zeros(seg_length,ceil(testDataSize/seg_length));
-xSeg(1:testDataSize) = testDataX(:);
-ySeg = zeros(seg_length,ceil(testDataSize/seg_length));
-ySeg(1:testDataSize) = testDataY(:);
-zSeg = zeros(seg_length,ceil(testDataSize/seg_length));
-zSeg(1:testDataSize) = testDataZ(:);
-
-
-% Verwerken data
-rows = numel(timeSeg)/seg_length;
-testFeatureMatrix = zeros(rows, 2);
-for ii=1:rows
-    % Feature extraction: 
-    tempFeatureMatrix = testFeatureExtraction(xSeg(:,ii), ySeg(:,ii), zSeg(:,ii));
-    testFeatureMatrix(ii,1) = tempFeatureMatrix(1,4);
-    testFeatureMatrix(ii,2) = tempFeatureMatrix(1,5);
-    %testFeatureMatrix(ii,1) = tempFeatureMatrix(1,1);
-    %testFeatureMatrix(ii,2) = tempFeatureMatrix(1,2);
-    %testFeatureMatrix(ii,3) = tempFeatureMatrix(1,3);
-    %testFeatureMatrix(ii,4) = tempFeatureMatrix(1,4);
-    %testFeatureMatrix(ii,5) = tempFeatureMatrix(1,5);
+for i = 1:length(testDataLabel)
+    %% Inlezen testdata
+    testDataX = testdata.AthensTest_Accel_LN_X_CAL(i);
+    testDataY = testdata.AthensTest_Accel_LN_Y_CAL(i);
+    testDataZ = testdata.AthensTest_Accel_LN_Z_CAL(i);
+    testDataLabel = testdata.Label(i);
+   if (testDataLabel ~= vorige)
+       if (activiteitenTeller ~= 0)
+           testActiviteiten(activiteitenTeller).x(tellerMeetpunt) = testDataX.'; 
+           testActiviteiten(activiteitenTeller).y(tellerMeetpunt) = testDataY.'; 
+           testActiviteiten(activiteitenTeller).z(tellerMeetpunt) = testDataZ.'; 
+           testActiviteiten(activiteitenTeller).label(tellerMeetpunt) = testDataLabel.';
+       end
+       activiteitenTeller = activiteitenTeller + 1;
+       tellerMeetpunt = 0;
+   end
+   vorige = testDataLabel;
+   tellerMeetpunt = tellerMeetpunt + 1;
+   
+   testActiviteiten(activiteitenTeller).x(tellerMeetpunt) = testDataX; 
+   testActiviteiten(activiteitenTeller).y(tellerMeetpunt) = testDataY; 
+   testActiviteiten(activiteitenTeller).z(tellerMeetpunt) = testDataZ; 
+   testActiviteiten(activiteitenTeller).label(tellerMeetpunt) = testDataLabel;
 end
 
+%%
+% Verwerken data
+testFeatureMatrix = featureExtraction(testActiviteiten);
 %% Test desicion tree
-Cpred = predict(tree,testFeatureMatrix);
+
+%% Accuracy on trainings data
+
+Cpred = predict(tree,[testFeatureMatrix(:,4), testFeatureMatrix(:,5)]);
 % van vb Clte = Class(p(n+1:2*n));
 % Deze getallen gebruikt omdat de som 81 is wat gelijk is aan het aantal
 % rijen van de testFeatureMatrix omdat de class van trainingsdata ook
 % gelijk is aantal rijen featurematrix.
+
+%%ROBIN: volgens mij moeten we nu een class maken door alle activiteiten
+%%met label '1' (als dat drinking is) "1" te maken, en al de resst "2" maar
+%%hier had ik geen tijd meer voor :)
 ClassTest = [ones(21,1);2*ones(20 + 20 + 20,1)];
 Clte = ClassTest;
 % Accurcy
