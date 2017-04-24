@@ -93,6 +93,7 @@ vorige = -1;
 tellerMeetpunt = 0;
 activiteitenTeller = 0;
 testDataLabel = testdata.Label;
+drinkingTeller = 0;
 for i = 1:length(testDataLabel)
     %% Inlezen testdata
     testDataX = testdata.AthensTest_Accel_LN_X_CAL(i);
@@ -108,6 +109,9 @@ for i = 1:length(testDataLabel)
        end
        activiteitenTeller = activiteitenTeller + 1;
        tellerMeetpunt = 0;
+       if(testDataLabel == 1)
+           drinkingTeller = drinkingTeller + 1;
+       end
    end
    vorige = testDataLabel;
    tellerMeetpunt = tellerMeetpunt + 1;
@@ -134,7 +138,7 @@ Cpred = predict(tree,[testFeatureMatrix(:,4), testFeatureMatrix(:,5)]);
 %%ROBIN: volgens mij moeten we nu een class maken door alle activiteiten
 %%met label '1' (als dat drinking is) "1" te maken, en al de resst "2" maar
 %%hier had ik geen tijd meer voor :)
-ClassTest = [ones(21,1);2*ones(20 + 20 + 20,1)];
+ClassTest = [ones(drinkingTeller,1);2*ones(41-drinkingTeller,1)];
 Clte = ClassTest;
 % Accurcy
 C = confusionmat(Clte,Cpred)
