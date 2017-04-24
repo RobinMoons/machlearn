@@ -40,11 +40,6 @@ title('gplotmatrix featureMatrix')
 tree = fitctree(featureMatrix, Class);
 view(tree)
 view(tree,'Mode','graph')
-% Dit is niet nodig, de volledige featureMatrix kiest zelf al feature 4 en 5 uit.
-% selectedFeatures = featureMatrix(: , 4:5);
-% view(selectedTree)
-% view(selectedTree,'Mode','graph')
-% selectedTree = fitctree(selectedFeatures, Class);
 
 %% Visualisation of results
 d = 0.01;
@@ -66,29 +61,7 @@ C = confusionmat(Class,Cpred_tr)
 accuracyTraingData = trace(C)/sum(sum(C))
 
 %%
-%%dit is verkeerd, we moeten niet met tijdsegmenatie werken maar de
-%%segmentatie moet gebeuren met de labels
-
-% testDataSize = numel(testDataTime);
-% % Verdeling moet nog beter gebeuren, nu wordt de laatste kolom gevuld met
-% % nullen.
-% seg_length = round(testDataSize/80, -2);
-% % Elke Seg matrix heeft per kolom 1 data segmentatie.
-% timeSeg = zeros(seg_length,ceil(testDataSize/seg_length));
-% timeSeg(1:testDataSize) = testDataTime(:);
-% labelSeg = zeros(seg_length,ceil(testDataSize/seg_length));
-% labelSeg(1:testDataSize) = testDataLabel(:);
-% xSeg = zeros(seg_length,ceil(testDataSize/seg_length));
-% xSeg(1:testDataSize) = testDataX(:);
-% ySeg = zeros(seg_length,ceil(testDataSize/seg_length));
-% ySeg(1:testDataSize) = testDataY(:);
-% zSeg = zeros(seg_length,ceil(testDataSize/seg_length));
-% zSeg(1:testDataSize) = testDataZ(:);
-
-
-%%
 %data segmentatie
-
 vorige = -1;
 tellerMeetpunt = 0;
 activiteitenTeller = 0;
@@ -130,15 +103,10 @@ testFeatureMatrix = featureExtraction(testActiviteiten);
 %% Accuracy on trainings data
 
 Cpred = predict(tree,[testFeatureMatrix(:,4), testFeatureMatrix(:,5)]);
-% van vb Clte = Class(p(n+1:2*n));
-% Deze getallen gebruikt omdat de som 81 is wat gelijk is aan het aantal
-% rijen van de testFeatureMatrix omdat de class van trainingsdata ook
-% gelijk is aantal rijen featurematrix.
 
-%%ROBIN: volgens mij moeten we nu een class maken door alle activiteiten
-%%met label '1' (als dat drinking is) "1" te maken, en al de resst "2" maar
-%%hier had ik geen tijd meer voor :)
-ClassTest = [ones(drinkingTeller,1);2*ones(41-drinkingTeller,1)];
+total = numel(testFeatureMatrix(:,4));
+
+ClassTest = [ones(drinkingTeller,1);2*ones(total-drinkingTeller,1)];
 Clte = ClassTest;
 % Accurcy
 C = confusionmat(Clte,Cpred)
