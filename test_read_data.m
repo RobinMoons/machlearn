@@ -112,6 +112,21 @@ Clte = ClassTest;
 C = confusionmat(Clte,Cpred)
 accuracyTestData = trace(C)/sum(sum(C))
 
+%% Bram: verder gegaan met de voorbeeldcode van de prof.
+% ROC curve one vs one
+% help resubPredict
+[~,score] = resubPredict(tree);
+%Class1 vs Class2
+%help perfcurve
+[fpr,tpr,T,AUC,OPTROCPT] = perfcurve(Class,score(:,1),1);
+figure
+plot(fpr,tpr)
+hold on
+plot(OPTROCPT(1),OPTROCPT(2),'ro')
+xlabel('False positive rate')
+ylabel('True positive rate')
+title('ROC Curve for Classification by Classification Trees')
+hold off
 
 % Also divide the feature space in the region of the positive instances and the region of the negative instances. 
 % Visualise also in the feature space the training instances. 
