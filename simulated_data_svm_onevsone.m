@@ -79,8 +79,6 @@ d = 0.01;
 xGrid = [x1Grid(:),x2Grid(:)];
 
 
-
-
 %% Accuracy on test data
 %help confusionmat
 [Cpred,score] = predict(SVMModel,Xte(:,1:2));

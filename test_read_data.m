@@ -57,8 +57,8 @@ view(tree,'Mode','graph')
 %help resubPredict
 [Cpred_tr,score,node] = resubPredict(tree);
 %help confusionmat
-C = confusionmat(Class,Cpred_tr)
-accuracyTraingData = trace(C)/sum(sum(C))
+C_decision_tr = confusionmat(Class,Cpred_tr)
+accuracyTraingData = trace(C_decision_tr)/sum(sum(C_decision_tr))
 
 %%
 %data segmentatie
@@ -147,8 +147,8 @@ xlabel('x1');
 ylabel('x2');
 
 %% Accurcy
-C = confusionmat(Clte,Cpred)
-accuracyTestData = trace(C)/sum(sum(C))
+C_decision_te = confusionmat(Clte,Cpred)
+accuracyTestData = trace(C_decision_te)/sum(sum(C_decision_te))
 
 %% Bram: verder gegaan met de voorbeeldcode van de prof.
 % ROC curve one vs one
@@ -175,3 +175,65 @@ hold off
 % Also calculate the confusion matrix on the training set. Use for that the instruction confusionmat in MATLAB.  
 % Extract the accuracy of the binary classifier. 
 % Note that calculating performance measures on the training data gives too optimistic results (overfitting). 
+
+%% SVM one vs the rest code.
+% Overgenomen van voorbeeld code die wel one vs one is.
+
+% SVM classifier one vs one
+
+%help fitcsvm
+%SVMModel = fitcsvm(Xtr(:,1:2),Cltr,'OptimizeHyperparameters','auto');
+SVMModel = fitcsvm(featureMatrix(:,1:2),Class);
+% Accuracy on trainings data
+%help resubPredict
+[Cpred_tr,score,node] = resubPredict(SVMModel);
+%help confusionmat
+C_SVM_tr = confusionmat(Class,Cpred_tr)
+accuracy_SVM_tr = trace(C_SVM_tr)/sum(sum(C_SVM_tr))
+
+% Accuracy on test data
+%help confusionmat
+[Cpred,score] = predict(SVMModel,testFeatureMatrix(:,4:5));
+C_SVM_te = confusionmat(Clte,Cpred)
+accuracy_SVM_te = trace(C_SVM_te)/sum(sum(C_SVM_te))
+
+% visualisation of results
+
+%help meshgrid
+d = 0.01;
+[x1Grid,x2Grid] = meshgrid(min(featureMatrix(:,1)):d:max(featureMatrix(:,1)),...
+    min(featureMatrix(:,2)):d:max(featureMatrix(:,2)));
+xGrid = [x1Grid(:),x2Grid(:)];
+
+labels = predict(SVMModel,xGrid);
+
+% Training data points
+figure('Name', 'SVM - 2D division feature curve trainingsdata', 'NumberTitle', 'off')
+h(1:2) = gscatter(xGrid(:,1),xGrid(:,2),labels,[0.1 0.5 0.5; 0.5 0.1 0.5 ]);
+hold on
+h(3:4) = gscatter(featureMatrix(:,1),featureMatrix(:,2),Class);
+legend(h,{'Class1','Class2','Class1 Tr','Class2 Tr'},...
+   'Location','Northwest');
+xlabel('x1');
+ylabel('x2');
+
+% Testing data points
+figure('Name', 'SVM - 2D division feature testdata (from testData.mat)', 'NumberTitle', 'off')
+h(1:2) = gscatter(xGrid(:,1),xGrid(:,2),labels,[0.1 0.5 0.5; 0.5 0.1 0.5 ]);
+hold on
+h(3:4) = gscatter(testFeatureMatrix(:,4),testFeatureMatrix(:,5),Clte);
+legend(h,{'Class1','Class2','Class1 Te','Class2 Te'},...
+   'Location','Northwest');
+xlabel('x1');
+ylabel('x2');
+
+% ROC curve one vs one
+[fpr,tpr,T,AUC,OPTROCPT] = perfcurve(Clte,score(:,1),1);
+AUC
+figROC=figure('Name', 'SVM - ROC curve testdata (from testData.mat)', 'NumberTitle', 'off')
+plot(fpr,tpr,'.-')
+hold on
+plot(OPTROCPT(1),OPTROCPT(2),'ro')
+xlabel('False positive rate')
+ylabel('True positive rate')
+title('ROC Curve for Classification by Classification SVM linear')
