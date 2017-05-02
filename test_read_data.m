@@ -106,7 +106,16 @@ Cpred = predict(tree,[testFeatureMatrix(:,4), testFeatureMatrix(:,5)]);
 
 total = numel(testFeatureMatrix(:,4));
 
-ClassTest = [ones(drinkingTeller,1);2*ones(total-drinkingTeller,1)];
+%ClassTest = [ones(drinkingTeller,1);2*ones(total-drinkingTeller,1)];
+ClassTest = [];
+for i = 1 : total
+    if (testActiviteiten(i).label(1) == 1)
+        ClassTest = vertcat(ClassTest, 1);
+    else
+        ClassTest = vertcat(ClassTest, 2);
+    end
+end
+
 Clte = ClassTest;
 % Accurcy
 C = confusionmat(Clte,Cpred)
