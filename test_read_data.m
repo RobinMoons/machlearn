@@ -42,16 +42,16 @@ view(tree)
 view(tree,'Mode','graph')
 
 %% Visualisation of results
-d = 0.01;
-[x1Grid,x2Grid] = meshgrid(min(featureMatrix(:,1)):d:max(featureMatrix(:,1)),min(featureMatrix(:,2)):d:max(featureMatrix(:,2)));
-xGrid = [x1Grid(:),x2Grid(:)];
-labels = predict(tree,xGrid);
-figure, h(1:2) = gscatter(xGrid(:,1),xGrid(:,2),labels,[0.1 0.5 0.5; 0.5 0.1 0.5 ]);
-hold on
-h(3:4) = gscatter(featureMatrix(:,1),featureMatrix(:,2),Class);
-legend(h,{'Class1','Class2','Class1 Tr','Class2 Tr'},'Location','Northwest');
-xlabel('x1');
-ylabel('x2');
+% d = 0.01;
+% [x1Grid,x2Grid] = meshgrid(min(featureMatrix(:,1)):d:max(featureMatrix(:,1)),min(featureMatrix(:,2)):d:max(featureMatrix(:,2)));
+% xGrid = [x1Grid(:),x2Grid(:)];
+% labels = predict(tree,xGrid);
+% figure, h(1:2) = gscatter(xGrid(:,1),xGrid(:,2),labels,[0.1 0.5 0.5; 0.5 0.1 0.5 ]);
+% hold on
+% h(3:4) = gscatter(featureMatrix(:,1),featureMatrix(:,2),Class);
+% legend(h,{'Class1','Class2','Class1 Tr','Class2 Tr'},'Location','Northwest');
+% xlabel('x1');
+% ylabel('x2');
 
 %% Accuracy on trainings data
 %help resubPredict
@@ -66,7 +66,7 @@ vorige = -1;
 tellerMeetpunt = 0;
 activiteitenTeller = 0;
 testDataLabel = testdata.Label;
-drinkingTeller = 0;
+% drinkingTeller = 0;
 for i = 1:length(testDataLabel)
     %% Inlezen testdata
     testDataX = testdata.AthensTest_Accel_LN_X_CAL(i);
@@ -82,9 +82,9 @@ for i = 1:length(testDataLabel)
        end
        activiteitenTeller = activiteitenTeller + 1;
        tellerMeetpunt = 0;
-       if(testDataLabel == 1)
-           drinkingTeller = drinkingTeller + 1;
-       end
+%        if(testDataLabel == 1)
+%            drinkingTeller = drinkingTeller + 1;
+%        end
    end
    vorige = testDataLabel;
    tellerMeetpunt = tellerMeetpunt + 1;
@@ -99,11 +99,10 @@ end
 % Verwerken data
 testFeatureMatrix = featureExtraction(testActiviteiten);
 %% Test desicion tree
-
-%% Accuracy on trainings data
-
 Cpred = predict(tree,[testFeatureMatrix(:,4), testFeatureMatrix(:,5)]);
 
+
+%% Accuracy on trainings data
 total = numel(testFeatureMatrix(:,4));
 
 %ClassTest = [ones(drinkingTeller,1);2*ones(total-drinkingTeller,1)];
@@ -117,7 +116,37 @@ for i = 1 : total
 end
 
 Clte = ClassTest;
-% Accurcy
+
+%% Visualisation of results
+% help meshgrid
+d = 0.01;
+[x1Grid,x2Grid] = meshgrid(min(featureMatrix(:,1)):d:max(featureMatrix(:,1)),...
+    min(featureMatrix(:,2)):d:max(featureMatrix(:,2)));
+xGrid = [x1Grid(:),x2Grid(:)];
+
+labels = predict(tree,xGrid);
+
+% Training data points
+figure('Name', 'Division 2D feature space trainingsdata', 'NumberTitle', 'off')
+h(1:2) = gscatter(xGrid(:,1),xGrid(:,2),labels,[0.1 0.5 0.5; 0.5 0.1 0.5 ]);
+hold on
+h(3:4) = gscatter(featureMatrix(:,1),featureMatrix(:,2),Class);
+legend(h,{'Class1','Class2','Class1 Tr','Class2 Tr'},...
+   'Location','Northwest');
+xlabel('x1');
+ylabel('x2');
+
+% Testing data points
+figure('Name', 'Division 2D feature space testdata (from testData.mat)', 'NumberTitle', 'off')
+h(1:2) = gscatter(xGrid(:,1),xGrid(:,2),labels,[0.1 0.5 0.5; 0.5 0.1 0.5 ]);
+hold on
+h(3:4) = gscatter(testFeatureMatrix(:,4),testFeatureMatrix(:,5),Clte);
+legend(h,{'Class1','Class2','Class1 Te','Class2 Te'},...
+   'Location','Northwest');
+xlabel('x1');
+ylabel('x2');
+
+%% Accurcy
 C = confusionmat(Clte,Cpred)
 accuracyTestData = trace(C)/sum(sum(C))
 
@@ -128,7 +157,8 @@ accuracyTestData = trace(C)/sum(sum(C))
 %Class1 vs Class2
 %help perfcurve
 [fpr,tpr,T,AUC,OPTROCPT] = perfcurve(Class,score(:,1),1);
-figure
+AUC
+figure('Name', 'ROC curve testdata (from testData.mat)', 'NumberTitle', 'off')
 plot(fpr,tpr)
 hold on
 plot(OPTROCPT(1),OPTROCPT(2),'ro')
