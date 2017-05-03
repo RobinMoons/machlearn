@@ -320,7 +320,12 @@ xGrid = [x1Grid(:),x2Grid(:)];
 % Voor: Mdl = fitcknn(Xtr,Cltr);
 
 % knn Classifier k == opt dist = opt
+
+%werkend bij Bram
 knnTree = fitcknn(featureMatrix,Class,'OptimizeHyperparameters','auto')
+
+%knnTree = fitcknn(featureMatrix,Class,'Standardize','on')
+
 knnTree
 
 % Accuracy on trainings data
