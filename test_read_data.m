@@ -2,163 +2,124 @@ close all;
 clear all;
 clc;
 
-testdata = load('testDataDetection.mat');
-testdata = testdata.data;
-data = load('data.mat');
-data = data.data;
+%Selected activity: DRINKING
+%Explanation of variables
+% featureMatrix_s : features from the whole small dataset
+% featureMatrix_l : features from the whole large dataset
+% Class_s : class from the whole small dataset (chosen DRINKING)
+% Class_l : class from the whole large dataset (chosen DRINKING)
 
-%% Extract features 
-drinkingFeature = featureExtraction(data.drinking);
-brushingFeature = featureExtraction(data.brush);
-writingFeature = featureExtraction(data.writing);
-shoeFeature = featureExtraction(data.shoe);
+%% load datasets
+%load large dataset
+largeData = load('testDataDetection.mat');
+largeData = largeData.data;
+%load small dataset
+smallData = load('data.mat');
+smallData = smallData.data;
+
+%% Extract features from small data set 
+drinkingFeature = featureExtraction(smallData.drinking);
+brushingFeature = featureExtraction(smallData.brush);
+writingFeature = featureExtraction(smallData.writing);
+shoeFeature = featureExtraction(smallData.shoe);
 col1 = [drinkingFeature(:,4); brushingFeature(:,4); writingFeature(:,4); shoeFeature(:,4)];
 col2 = [drinkingFeature(:,5); brushingFeature(:,5); writingFeature(:,5); shoeFeature(:,5)];
-featureMatrix = [col1,col2];
-%TestfeatureMatrix = featureMatrix';
-   
-%% Scatter plots van de features
-amountDrinking = numel(data.drinking);
-amountBrush = numel(data.brush);
-amountShoe = numel(data.shoe);
-amountWriting = numel(data.writing);
-Class = [ones(amountDrinking,1);2*ones(amountBrush + amountShoe + amountWriting,1)];
-figure, gplotmatrix(featureMatrix,[],Class)
-title('gplotmatrix featureMatrix')
+featureMatrix_s = [col1,col2];
+%create class (used to check the results)
+amountDrinking = numel(smallData.drinking);
+amountBrush = numel(smallData.brush);
+amountShoe = numel(smallData.shoe);
+amountWriting = numel(smallData.writing);
+Class_s = [ones(amountDrinking,1);2*ones(amountBrush + amountShoe + amountWriting,1)];   
+% Scatter plots from features 
+figure, gplotmatrix(featureMatrix_s,[],Class_s)
+title('gplotmatrix featureMatrix_s')
 
-%Nieuwe deel van de taak
-%% Decision Trees for Binary Classification
-% For illustration purpose use the 2 most discriminating features from the data exploration part. 
-% --> 25 en 75 percentile
-% Each group selects one of the four activities it wants to detect. 
-% --> drinking
-% Use the binary classification approach one versus the rest to construct the decision tree. 
-% Construct a decision tree with the training data given in data.mat. 
-% You can use the instruction fitctree in MATLAB for this purpose. 
+%% Extract features from 1/3 and 2/3 dataset from small dataset
+%create array with 4 activities from each feature ( = approx. 1/3 of the set)
+activities_1_3 = [smallData.drinking(1:4),smallData.writing(1:4),smallData.shoe(1:4),smallData.brush(1:4)]; 
+%create array with the rest of the activities from each feature ( = approx. 2/3 of the set)
+activities_2_3 = [smallData.drinking(5:amountDrinking),smallData.writing(5:amountWriting),smallData.shoe(5:amountShoe),smallData.brush(5:amountBrush)];
+number_1_3 = numel(activities_1_3);
+number_2_3 = numel(activities_2_3);
+%Create class for 1/3 set 1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,
+Class_1_3 = [ones(4,1);2*ones(number_1_3-4,1)]; 
+%Create class with the rest of drinking as 1 and the other rest as 2
+Class_2_3 = [ones(amountDrinking-4,1);2*ones(number_2_3-(amountDrinking-4),1)]; 
+%extract features from 1/3 set
+featureMatrix_1_3 = featureExtraction(activities_1_3);
+%extract features from 2/3 set
+featureMatrix_2_3 = featureExtraction(activities_2_3);
 
-%% decission tree
-tree = fitctree(featureMatrix, Class);
-view(tree)
-view(tree,'Mode','graph')
-
-%% Visualisation of results
-% d = 0.01;
-% [x1Grid,x2Grid] = meshgrid(min(featureMatrix(:,1)):d:max(featureMatrix(:,1)),min(featureMatrix(:,2)):d:max(featureMatrix(:,2)));
-% xGrid = [x1Grid(:),x2Grid(:)];
-% labels = predict(tree,xGrid);
-% figure, h(1:2) = gscatter(xGrid(:,1),xGrid(:,2),labels,[0.1 0.5 0.5; 0.5 0.1 0.5 ]);
-% hold on
-% h(3:4) = gscatter(featureMatrix(:,1),featureMatrix(:,2),Class);
-% legend(h,{'Class1','Class2','Class1 Tr','Class2 Tr'},'Location','Northwest');
-% xlabel('x1');
-% ylabel('x2');
-
-%% Accuracy on trainings data
-%help resubPredict
-[Cpred_tr,score,node] = resubPredict(tree);
-%help confusionmat
-C_decision_tr = confusionmat(Class,Cpred_tr)
-accuracyTraingData = trace(C_decision_tr)/sum(sum(C_decision_tr))
-
-%%
-%data segmentatie
-numberSamples = numel(testdata.AthensTest_Accel_LN_X_CAL)
+%% Extract features from large data set
+%segmentatie large dataset
+numberSamples = numel(largeData.AthensTest_Accel_LN_X_CAL)
 size = 2000;
-numberActivities = numberSamples / size
-
+numberActivities = floor(numberSamples / size)
+drinkingActivityCounter = 0;
 for activity = 1:1:numberActivities
+    drinkingCounter = 0;
     for i = 1:1:size
-        testDataX = testdata.AthensTest_Accel_LN_X_CAL((activity-1)*size + i);
-        testDataY = testdata.AthensTest_Accel_LN_Y_CAL((activity-1)*size + i);
-        testDataZ = testdata.AthensTest_Accel_LN_Z_CAL((activity-1)*size + i);        
-        testDataLabel = testdata.Label((activity-1)*size + i);
+        testDataX = largeData.AthensTest_Accel_LN_X_CAL((activity-1)*size + i);
+        testDataY = largeData.AthensTest_Accel_LN_Y_CAL((activity-1)*size + i);
+        testDataZ = largeData.AthensTest_Accel_LN_Z_CAL((activity-1)*size + i);        
+        testDataLabel = largeData.Label((activity-1)*size + i);
         testActiviteiten(activity).x(i) = testDataX.';
         testActiviteiten(activity).y(i) = testDataY.';
         testActiviteiten(activity).z(i) = testDataZ.';
         testActiviteiten(activity).label(i) = testDataLabel.';
+        if (testDataLabel == 1) %activity drinking = 1
+            drinkingCounter = drinkingCounter + 1;        
+        end 
+    end
+    if (drinkingCounter > (size/2))
+        drinkingActivityCounter = drinkingActivityCounter +1;
     end
 end
+%extract features
+featureMatrix_l = featureExtraction(testActiviteiten);
+featureMatrix_l = [featureMatrix_l(:,4),featureMatrix_l(:,5)];
+%create class (used to check the results)
+Class_l = [ones(drinkingActivityCounter,1);2*ones((numberActivities - drinkingActivityCounter),1)];    
+%Scatter plots from features 
+%figure, gplotmatrix(featureMatrix_l,[],Class_l);
+%title('gplotmatrix featureMatrix_l')
 
+%% Binary classification
+%train with large dataset
+tree = fitctree(featureMatrix_s, Class_s);
+%view(tree)
+%view(tree,'Mode','graph')
+Cpred = predict(tree,[featureMatrix_l(:,4), featureMatrix_l(:,5)]);
+% Check accuracy 
+[Cpred_tr,score,node] = resubPredict(tree);
+C_decision_tr = confusionmat(Class_s,Cpred_tr)
+accuracySmallData = trace(C_decision_tr)/sum(sum(C_decision_tr))
 
-% vorige = -1;
-% tellerMeetpunt = 0;
-% activiteitenTeller = 0;
-% testDataLabel = testdata.Label;
-% % drinkingTeller = 0;
-% for i = 1:length(testDataLabel)
-%     %% Inlezen testdata
-%     testDataX = testdata.AthensTest_Accel_LN_X_CAL(i);
-%     testDataY = testdata.AthensTest_Accel_LN_Y_CAL(i);
-%     testDataZ = testdata.AthensTest_Accel_LN_Z_CAL(i);
-%     testDataLabel = testdata.Label(i);
-%    if (testDataLabel ~= vorige)
-%        if (activiteitenTeller ~= 0)
-%            testActiviteiten(activiteitenTeller).x(tellerMeetpunt) = testDataX.'; 
-%            testActiviteiten(activiteitenTeller).y(tellerMeetpunt) = testDataY.'; 
-%            testActiviteiten(activiteitenTeller).z(tellerMeetpunt) = testDataZ.'; 
-%            testActiviteiten(activiteitenTeller).label(tellerMeetpunt) = testDataLabel.';
-%        end
-%        activiteitenTeller = activiteitenTeller + 1;
-%        tellerMeetpunt = 0;
-% %        if(testDataLabel == 1)
-% %            drinkingTeller = drinkingTeller + 1;
-% %        end
-%    end
-%    vorige = testDataLabel;
-%    tellerMeetpunt = tellerMeetpunt + 1;
-%    
-%    testActiviteiten(activiteitenTeller).x(tellerMeetpunt) = testDataX; 
-%    testActiviteiten(activiteitenTeller).y(tellerMeetpunt) = testDataY; 
-%    testActiviteiten(activiteitenTeller).z(tellerMeetpunt) = testDataZ; 
-%    testActiviteiten(activiteitenTeller).label(tellerMeetpunt) = testDataLabel;
-% end
+%train with small dataset
 
-%%
-% Verwerken data
-testFeatureMatrix = featureExtraction(testActiviteiten);
-%% Test desicion tree
-Cpred = predict(tree,[testFeatureMatrix(:,4), testFeatureMatrix(:,5)]);
-
-
-%% Accuracy on trainings data
-total = numel(testFeatureMatrix(:,4));
-
-%ClassTest = [ones(drinkingTeller,1);2*ones(total-drinkingTeller,1)];
-ClassTest = [];
-for i = 1 : total
-    if (testActiviteiten(i).label(1) == 1)
-        ClassTest = vertcat(ClassTest, 1);
-    else
-        ClassTest = vertcat(ClassTest, 2);
-    end
-end
-
-Clte = ClassTest;
 
 %% Visualisation of results
 % help meshgrid
 d = 0.01;
-[x1Grid,x2Grid] = meshgrid(min(featureMatrix(:,1)):d:max(featureMatrix(:,1)),...
-    min(featureMatrix(:,2)):d:max(featureMatrix(:,2)));
+[x1Grid,x2Grid] = meshgrid(min(featureMatrix_s(:,1)):d:max(featureMatrix_s(:,1)),...
+    min(featureMatrix_s(:,2)):d:max(featureMatrix_s(:,2)));
 xGrid = [x1Grid(:),x2Grid(:)];
-
 labels = predict(tree,xGrid);
-
 % Training data points
 figure('Name', 'Division 2D feature space trainingsdata', 'NumberTitle', 'off')
 h(1:2) = gscatter(xGrid(:,1),xGrid(:,2),labels,[0.1 0.5 0.5; 0.5 0.1 0.5 ]);
 hold on
-h(3:4) = gscatter(featureMatrix(:,1),featureMatrix(:,2),Class);
+h(3:4) = gscatter(featureMatrix_s(:,1),featureMatrix_s(:,2),Class_s);
 legend(h,{'Class1','Class2','Class1 Tr','Class2 Tr'},...
    'Location','Northwest');
 xlabel('x1');
 ylabel('x2');
-
 % Testing data points
 figure('Name', 'Division 2D feature space testdata (from testData.mat)', 'NumberTitle', 'off')
 h(1:2) = gscatter(xGrid(:,1),xGrid(:,2),labels,[0.1 0.5 0.5; 0.5 0.1 0.5 ]);
 hold on
-h(3:4) = gscatter(testFeatureMatrix(:,4),testFeatureMatrix(:,5),Clte);
+h(3:4) = gscatter(featureMatrix_l(:,4),featureMatrix_l(:,5),Clte);
 legend(h,{'Class1','Class2','Class1 Te','Class2 Te'},...
    'Location','Northwest');
 xlabel('x1');
@@ -174,7 +135,7 @@ accuracyTestData = trace(C_decision_te)/sum(sum(C_decision_te))
 [~,score] = resubPredict(tree);
 %Class1 vs Class2
 %help perfcurve
-[fpr,tpr,T,AUC,OPTROCPT] = perfcurve(Class,score(:,1),1);
+[fpr,tpr,T,AUC,OPTROCPT] = perfcurve(Class_s,score(:,1),1);
 AUC
 figure('Name', 'ROC curve testdata (from testData.mat)', 'NumberTitle', 'off')
 plot(fpr,tpr)
@@ -201,17 +162,17 @@ hold off
 
 %help fitcsvm
 %SVMModel = fitcsvm(Xtr(:,1:2),Cltr,'OptimizeHyperparameters','auto');
-SVMModel = fitcsvm(featureMatrix(:,1:2),Class);
+SVMModel = fitcsvm(featureMatrix_s(:,1:2),Class_s);
 % Accuracy on trainings data
 %help resubPredict
 [Cpred_tr,score,node] = resubPredict(SVMModel);
 %help confusionmat
-C_SVM_tr = confusionmat(Class,Cpred_tr)
+C_SVM_tr = confusionmat(Class_s,Cpred_tr)
 accuracy_SVM_tr = trace(C_SVM_tr)/sum(sum(C_SVM_tr))
 
 % Accuracy on test data
 %help confusionmat
-[Cpred,score] = predict(SVMModel,testFeatureMatrix(:,4:5));
+[Cpred,score] = predict(SVMModel,featureMatrix_l(:,4:5));
 C_SVM_te = confusionmat(Clte,Cpred)
 accuracy_SVM_te = trace(C_SVM_te)/sum(sum(C_SVM_te))
 
@@ -219,8 +180,8 @@ accuracy_SVM_te = trace(C_SVM_te)/sum(sum(C_SVM_te))
 
 %help meshgrid
 d = 0.01;
-[x1Grid,x2Grid] = meshgrid(min(featureMatrix(:,1)):d:max(featureMatrix(:,1)),...
-    min(featureMatrix(:,2)):d:max(featureMatrix(:,2)));
+[x1Grid,x2Grid] = meshgrid(min(featureMatrix_s(:,1)):d:max(featureMatrix_s(:,1)),...
+    min(featureMatrix_s(:,2)):d:max(featureMatrix_s(:,2)));
 xGrid = [x1Grid(:),x2Grid(:)];
 
 labels = predict(SVMModel,xGrid);
@@ -229,7 +190,7 @@ labels = predict(SVMModel,xGrid);
 figure('Name', 'SVM - 2D division feature curve trainingsdata', 'NumberTitle', 'off')
 h(1:2) = gscatter(xGrid(:,1),xGrid(:,2),labels,[0.1 0.5 0.5; 0.5 0.1 0.5 ]);
 hold on
-h(3:4) = gscatter(featureMatrix(:,1),featureMatrix(:,2),Class);
+h(3:4) = gscatter(featureMatrix_s(:,1),featureMatrix_s(:,2),Class_s);
 legend(h,{'Class1','Class2','Class1 Tr','Class2 Tr'},...
    'Location','Northwest');
 xlabel('x1');
@@ -239,7 +200,7 @@ ylabel('x2');
 figure('Name', 'SVM - 2D division feature testdata (from testData.mat)', 'NumberTitle', 'off')
 h(1:2) = gscatter(xGrid(:,1),xGrid(:,2),labels,[0.1 0.5 0.5; 0.5 0.1 0.5 ]);
 hold on
-h(3:4) = gscatter(testFeatureMatrix(:,4),testFeatureMatrix(:,5),Clte);
+h(3:4) = gscatter(featureMatrix_l(:,4),featureMatrix_l(:,5),Clte);
 legend(h,{'Class1','Class2','Class1 Te','Class2 Te'},...
    'Location','Northwest');
 xlabel('x1');
@@ -259,12 +220,12 @@ title('ROC Curve for Classification by Classification SVM linear')
 %% Naive bayes as Binary classificcation
 % Meshgrid
 d = 0.1;
-[x1Grid,x2Grid] = meshgrid(min(featureMatrix(:,1)):d:max(featureMatrix(:,1)),...
-    min(featureMatrix(:,2)):d:max(featureMatrix(:,2)));
+[x1Grid,x2Grid] = meshgrid(min(featureMatrix_s(:,1)):d:max(featureMatrix_s(:,1)),...
+    min(featureMatrix_s(:,2)):d:max(featureMatrix_s(:,2)));
 xGrid = [x1Grid(:),x2Grid(:)];
 
 % Classification
-bayesTree = fitcnb(featureMatrix,Class);
+bayesTree = fitcnb(featureMatrix_s,Class_s);
 
 bayesTree
 bayesTree.DistributionParameters
@@ -286,10 +247,10 @@ end
 %help resubPredict
 [Cpred_tr,score,node] = resubPredict(bayesTree);
 %help confusionmat
-C_bayes_tr = confusionmat(Class,Cpred_tr)
+C_bayes_tr = confusionmat(Class_s,Cpred_tr)
 accuracy = trace(C_bayes_tr)/sum(sum(C_bayes_tr))
 
-[Cpred,score] = predict(bayesTree,testFeatureMatrix(:,4:5));
+[Cpred,score] = predict(bayesTree,featureMatrix_l(:,4:5));
 C_bayes_te = confusionmat(Clte,Cpred)
 accuracy = trace(C_bayes_te)/sum(sum(C_bayes_te))
 
@@ -300,7 +261,7 @@ labels = predict(bayesTree,xGrid);
 figure('Name', 'Naive Bayes - 2D division feature curve trainingsdata', 'NumberTitle', 'off')
 h(1:2) = gscatter(xGrid(:,1),xGrid(:,2),labels,[0.1 0.5 0.5; 0.5 0.1 0.5 ]);
 hold on
-h(3:4) = gscatter(featureMatrix(:,1),featureMatrix(:,2),Class);
+h(3:4) = gscatter(featureMatrix_s(:,1),featureMatrix_s(:,2),Class_s);
 legend(h,{'Class1','Class2','Class1 Tr','Class2 Tr'},...
    'Location','Northwest');
 xlabel('x1');
@@ -310,7 +271,7 @@ ylabel('x2');
 figure('Name', 'Naive Bayes - 2D division feature curve testdata (from testData.mat)', 'NumberTitle', 'off')
 h(1:2) = gscatter(xGrid(:,1),xGrid(:,2),labels,[0.1 0.5 0.5; 0.5 0.1 0.5 ]);
 hold on
-h(3:4) = gscatter(testFeatureMatrix(:,4),testFeatureMatrix(:,5),Clte);
+h(3:4) = gscatter(featureMatrix_l(:,4),featureMatrix_l(:,5),Clte);
 legend(h,{'Class1','Class2','Class1 Te','Class2 Te'},...
    'Location','Northwest');
 xlabel('x1');
@@ -330,8 +291,8 @@ title('ROC Curve for Classification by Naive Bayes')
 %% K-nearest neighbour as Binary Classification
 % meshgrid
 d = 0.1;
-[x1Grid,x2Grid] = meshgrid(min(featureMatrix(:,1)):d:max(featureMatrix(:,1)),...
-    min(featureMatrix(:,2)):d:max(featureMatrix(:,2)));
+[x1Grid,x2Grid] = meshgrid(min(featureMatrix_s(:,1)):d:max(featureMatrix_s(:,1)),...
+    min(featureMatrix_s(:,2)):d:max(featureMatrix_s(:,2)));
 xGrid = [x1Grid(:),x2Grid(:)];
 
 % knn Classifier k == 1 dist = euclidian
@@ -340,7 +301,7 @@ xGrid = [x1Grid(:),x2Grid(:)];
 % knn Classifier k == opt dist = opt
 
 %werkend bij Bram
-knnTree = fitcknn(featureMatrix,Class,'OptimizeHyperparameters','auto')
+knnTree = fitcknn(featureMatrix_s,Class_s,'OptimizeHyperparameters','auto')
 
 %knnTree = fitcknn(featureMatrix,Class,'Standardize','on')
 
@@ -348,11 +309,11 @@ knnTree
 
 % Accuracy on trainings data
 [Cpred_tr,score,node] = resubPredict(knnTree);
-C_knear_tr = confusionmat(Class,Cpred_tr)
+C_knear_tr = confusionmat(Class_s,Cpred_tr)
 accuracy = trace(C_knear_tr)/sum(sum(C_knear_tr))
 
 % Accuracy on test data
-[Cpred,score] = predict(knnTree,testFeatureMatrix(:,4:5));
+[Cpred,score] = predict(knnTree,featureMatrix_l(:,4:5));
 C_knear_te = confusionmat(Clte,Cpred)
 accuracy = trace(C_knear_te)/sum(sum(C_knear_te))
 
@@ -363,7 +324,7 @@ labels = predict(knnTree,xGrid);
 figure('Name', 'K-nearest neighbor - 2D division feature curve trainingsdata', 'NumberTitle', 'off')
 h(1:2) = gscatter(xGrid(:,1),xGrid(:,2),labels,[0.1 0.5 0.5; 0.5 0.1 0.5 ]);
 hold on
-h(3:4) = gscatter(featureMatrix(:,1),featureMatrix(:,2),Class);
+h(3:4) = gscatter(featureMatrix_s(:,1),featureMatrix_s(:,2),Class_s);
 legend(h,{'Class1','Class2','Class1 Tr','Class2 Tr'},...
    'Location','Northwest');
 xlabel('x1');
@@ -373,7 +334,7 @@ ylabel('x2');
 figure('Name', 'K-nearest neighbor - 2D division feature curve testdata (from testData.mat)', 'NumberTitle', 'off')
 h(1:2) = gscatter(xGrid(:,1),xGrid(:,2),labels,[0.1 0.5 0.5; 0.5 0.1 0.5 ]);
 hold on
-h(3:4) = gscatter(testFeatureMatrix(:,4),testFeatureMatrix(:,5),Clte);
+h(3:4) = gscatter(featureMatrix_l(:,4),featureMatrix_l(:,5),Clte);
 legend(h,{'Class1','Class2','Class1 Te','Class2 Te'},...
    'Location','Northwest');
 xlabel('x1');
