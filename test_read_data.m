@@ -62,38 +62,56 @@ accuracyTraingData = trace(C_decision_tr)/sum(sum(C_decision_tr))
 
 %%
 %data segmentatie
-vorige = -1;
-tellerMeetpunt = 0;
-activiteitenTeller = 0;
-testDataLabel = testdata.Label;
-% drinkingTeller = 0;
-for i = 1:length(testDataLabel)
-    %% Inlezen testdata
-    testDataX = testdata.AthensTest_Accel_LN_X_CAL(i);
-    testDataY = testdata.AthensTest_Accel_LN_Y_CAL(i);
-    testDataZ = testdata.AthensTest_Accel_LN_Z_CAL(i);
-    testDataLabel = testdata.Label(i);
-   if (testDataLabel ~= vorige)
-       if (activiteitenTeller ~= 0)
-           testActiviteiten(activiteitenTeller).x(tellerMeetpunt) = testDataX.'; 
-           testActiviteiten(activiteitenTeller).y(tellerMeetpunt) = testDataY.'; 
-           testActiviteiten(activiteitenTeller).z(tellerMeetpunt) = testDataZ.'; 
-           testActiviteiten(activiteitenTeller).label(tellerMeetpunt) = testDataLabel.';
-       end
-       activiteitenTeller = activiteitenTeller + 1;
-       tellerMeetpunt = 0;
-%        if(testDataLabel == 1)
-%            drinkingTeller = drinkingTeller + 1;
-%        end
-   end
-   vorige = testDataLabel;
-   tellerMeetpunt = tellerMeetpunt + 1;
-   
-   testActiviteiten(activiteitenTeller).x(tellerMeetpunt) = testDataX; 
-   testActiviteiten(activiteitenTeller).y(tellerMeetpunt) = testDataY; 
-   testActiviteiten(activiteitenTeller).z(tellerMeetpunt) = testDataZ; 
-   testActiviteiten(activiteitenTeller).label(tellerMeetpunt) = testDataLabel;
+numberSamples = numel(testdata.AthensTest_Accel_LN_X_CAL)
+size = 2000;
+numberActivities = numberSamples / size
+
+for activity = 1:1:numberActivities
+    for i = 1:1:size
+        testDataX = testdata.AthensTest_Accel_LN_X_CAL((activity-1)*size + i);
+        testDataY = testdata.AthensTest_Accel_LN_Y_CAL((activity-1)*size + i);
+        testDataZ = testdata.AthensTest_Accel_LN_Z_CAL((activity-1)*size + i);        
+        testDataLabel = testdata.Label((activity-1)*size + i);
+        testActiviteiten(activity).x(i) = testDataX.';
+        testActiviteiten(activity).y(i) = testDataY.';
+        testActiviteiten(activity).z(i) = testDataZ.';
+        testActiviteiten(activity).label(i) = testDataLabel.';
+    end
 end
+
+
+% vorige = -1;
+% tellerMeetpunt = 0;
+% activiteitenTeller = 0;
+% testDataLabel = testdata.Label;
+% % drinkingTeller = 0;
+% for i = 1:length(testDataLabel)
+%     %% Inlezen testdata
+%     testDataX = testdata.AthensTest_Accel_LN_X_CAL(i);
+%     testDataY = testdata.AthensTest_Accel_LN_Y_CAL(i);
+%     testDataZ = testdata.AthensTest_Accel_LN_Z_CAL(i);
+%     testDataLabel = testdata.Label(i);
+%    if (testDataLabel ~= vorige)
+%        if (activiteitenTeller ~= 0)
+%            testActiviteiten(activiteitenTeller).x(tellerMeetpunt) = testDataX.'; 
+%            testActiviteiten(activiteitenTeller).y(tellerMeetpunt) = testDataY.'; 
+%            testActiviteiten(activiteitenTeller).z(tellerMeetpunt) = testDataZ.'; 
+%            testActiviteiten(activiteitenTeller).label(tellerMeetpunt) = testDataLabel.';
+%        end
+%        activiteitenTeller = activiteitenTeller + 1;
+%        tellerMeetpunt = 0;
+% %        if(testDataLabel == 1)
+% %            drinkingTeller = drinkingTeller + 1;
+% %        end
+%    end
+%    vorige = testDataLabel;
+%    tellerMeetpunt = tellerMeetpunt + 1;
+%    
+%    testActiviteiten(activiteitenTeller).x(tellerMeetpunt) = testDataX; 
+%    testActiviteiten(activiteitenTeller).y(tellerMeetpunt) = testDataY; 
+%    testActiviteiten(activiteitenTeller).z(tellerMeetpunt) = testDataZ; 
+%    testActiviteiten(activiteitenTeller).label(tellerMeetpunt) = testDataLabel;
+% end
 
 %%
 % Verwerken data
