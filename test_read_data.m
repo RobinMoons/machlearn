@@ -93,56 +93,48 @@ Class_l = [ones(drinkingActivityCounter,1);2*ones((numberActivities - drinkingAc
 % train with 2/3 dataset
 model_2_3 = fitctree(featureMatrix_2_3, Class_2_3);
 % test with 2/3 dataset
-[Cpred,score,node] = resubPredict(model_2_3);
+[Cpred,score_2_3,node] = resubPredict(model_2_3);
 % check accuracy trainingsdata
 C = confusionmat(Class_2_3,Cpred)
 Acc_tree_2_3_training = trace(C)/sum(sum(C))
 % test model with 1/3 data
-[Cpred,score] = predict(model_2_3,featureMatrix_1_3);
+[Cpred,score_1_3] = predict(model_2_3,featureMatrix_1_3);
 % check accuracy testdata
 C = confusionmat(Class_1_3,Cpred)
 Acc_tree_1_3_test = trace(C)/sum(sum(C))
 
-%hier verder doen, functie maken die 4 ROC plots returnd en de AUC
-% [fpr,tpr,T,AUC,OPTROCPT] = perfcurve(Class_1_3,score(:,1),1);
-% AUC
-% figure('Name', 'ROC curve testsdata 1/3 ', 'NumberTitle', 'off');
-% plot(fpr,tpr)
-% hold on
-% plot(OPTROCPT(1),OPTROCPT(2),'ro')
-% xlabel('False positive rate')
-% ylabel('True positive rate')
-% title('ROC Curve for Classification by Classification Trees')
-% hold off
-
 % train with small dataset
 model_s = fitctree(featureMatrix_s, Class_s);
 % test with small dataset
-[Cpred,score,node] = resubPredict(model_s);
+[Cpred,score_s,node] = resubPredict(model_s);
 % check accuracy trainingsdata
 C = confusionmat(Class_s,Cpred)
 Acc_tree_s_training = trace(C)/sum(sum(C))
 % test with large dataset
-[Cpred,score] = predict(model_s,featureMatrix_l);
+[Cpred,score_l] = predict(model_s,featureMatrix_l);
 % check accuracy testdata
 C = confusionmat(Class_l,Cpred)
 Acc_tree_l_test = trace(C)/sum(sum(C))
 
-%%Visualisation of results
+% Visualisation of results
 result = createGscatter(featureMatrix_2_3,Class_2_3,featureMatrix_1_3,Class_1_3,model_2_3,featureMatrix_s,Class_s,featureMatrix_l,Class_l,model_s);
-
-
+% ROC curves and AUC's
+[result, AUC_bin_2_3_tr, AUC_bin_1_3_te, AUC_bin_s_tr, AUC_bin_l_te] = createAUC(score_2_3,Class_2_3,score_1_3,Class_1_3,score_s,Class_s,score_l,Class_l);
+AUC_bin_2_3_tr
+AUC_bin_1_3_te
+AUC_bin_s_tr
+AUC_bin_l_te
 
 %% SVM for binary classification
 % train with 2/3 dataset
 SVMModel_2_3 = fitcsvm(featureMatrix_2_3,Class_2_3);
 % test with 2/3 dataset
-[Cpred,score,node] = resubPredict(SVMModel_2_3);
+[Cpred,score_2_3,node] = resubPredict(SVMModel_2_3);
 % check accuracy trainingsdata
 C = confusionmat(Class_2_3,Cpred)
 Acc_svm_2_3_training = trace(C)/sum(sum(C))
 % test model with 1/3 data
-[Cpred,score] = predict(SVMModel_2_3,featureMatrix_1_3);
+[Cpred,score_1_3] = predict(SVMModel_2_3,featureMatrix_1_3);
 % check accuracy testdata
 C = confusionmat(Class_1_3,Cpred)
 Acc_svm_1_3_test = trace(C)/sum(sum(C))
@@ -150,29 +142,35 @@ Acc_svm_1_3_test = trace(C)/sum(sum(C))
 % train with small dataset
 SVMModel_s = fitcsvm(featureMatrix_s, Class_s);
 % test with small dataset
-[Cpred,score,node] = resubPredict(SVMModel_s);
+[Cpred,score_s,node] = resubPredict(SVMModel_s);
 % check accuracy trainingsdata
 C = confusionmat(Class_s,Cpred)
 Acc_svm_s_training = trace(C)/sum(sum(C))
 % test with large dataset
-[Cpred,score] = predict(SVMModel,featureMatrix_l);
+[Cpred,score_l] = predict(SVMModel_s,featureMatrix_l);
 % check accuracy testdata
 C = confusionmat(Class_l,Cpred)
 Acc_svm_l_test = trace(C)/sum(sum(C))
 
-%%Visualisation of results
+% Visualisation of results
 result = createGscatter(featureMatrix_2_3,Class_2_3,featureMatrix_1_3,Class_1_3,SVMModel_2_3,featureMatrix_s,Class_s,featureMatrix_l,Class_l,SVMModel_s)
+% ROC curves and AUC's
+[result, AUC_bin_2_3_tr, AUC_bin_1_3_te, AUC_bin_s_tr, AUC_bin_l_te] = createAUC(score_2_3,Class_2_3,score_1_3,Class_1_3,score_s,Class_s,score_l,Class_l);
+AUC_bin_2_3_tr
+AUC_bin_1_3_te
+AUC_bin_s_tr
+AUC_bin_l_te
 
 %% Naive Bayes for binary classification 
 % train with 2/3 dataset
 BayesModel_2_3 = fitcnb(featureMatrix_2_3,Class_2_3);
 % test with 2/3 dataset
-[Cpred,score,node] = resubPredict(BayesModel_2_3);
+[Cpred,score_2_3,node] = resubPredict(BayesModel_2_3);
 % check accuracy trainingsdata
 C = confusionmat(Class_2_3,Cpred)
 Acc_bayes_2_3_training = trace(C)/sum(sum(C))
 % test model with 1/3 data
-[Cpred,score] = predict(BayesModel_2_3,featureMatrix_1_3);
+[Cpred,score_1_3] = predict(BayesModel_2_3,featureMatrix_1_3);
 % check accuracy testdata
 C = confusionmat(Class_1_3,Cpred)
 Acc_bayes_1_3_test = trace(C)/sum(sum(C))
@@ -180,18 +178,24 @@ Acc_bayes_1_3_test = trace(C)/sum(sum(C))
 % train with small dataset
 BayesModel_s = fitcnb(featureMatrix_s, Class_s);
 % test with small dataset
-[Cpred,score,node] = resubPredict(BayesModel_s);
+[Cpred,score_s,node] = resubPredict(BayesModel_s);
 % check accuracy trainingsdata
 C = confusionmat(Class_s,Cpred)
 Acc_bayes_s_training = trace(C)/sum(sum(C))
 % test with large dataset
-[Cpred,score] = predict(BayesModel_s,featureMatrix_l);
+[Cpred,score_l] = predict(BayesModel_s,featureMatrix_l);
 % check accuracy testdata
 C = confusionmat(Class_l,Cpred)
 Acc_bayes_l_test = trace(C)/sum(sum(C))
 
-%%Visualisation of results
+% Visualisation of results
 result = createGscatter(featureMatrix_2_3,Class_2_3,featureMatrix_1_3,Class_1_3,BayesModel_2_3,featureMatrix_s,Class_s,featureMatrix_l,Class_l,BayesModel_s)
+% ROC curves and AUC's
+[result, AUC_bin_2_3_tr, AUC_bin_1_3_te, AUC_bin_s_tr, AUC_bin_l_te] = createAUC(score_2_3,Class_2_3,score_1_3,Class_1_3,score_s,Class_s,score_l,Class_l);
+AUC_bin_2_3_tr
+AUC_bin_1_3_te
+AUC_bin_s_tr
+AUC_bin_l_te
 
 %% K-nearest neighbour for binary classification
 % train with 2/3 dataset
@@ -199,12 +203,12 @@ KnnModel_2_3 = fitcknn(featureMatrix_2_3,Class_2_3);
 % use this line for the 3D graph
 %KnnModel = fitcknn(featureMatrix_2_3,Class_2_3,'OptimizeHyperparameters','auto') 
 % test with 2/3 dataset
-[Cpred,score,node] = resubPredict(KnnModel_2_3);
+[Cpred,score_2_3,node] = resubPredict(KnnModel_2_3);
 % check accuracy trainingsdata
 C = confusionmat(Class_2_3,Cpred)
 Acc_Kn_2_3_training = trace(C)/sum(sum(C))
 % test model with 1/3 data
-[Cpred,score] = predict(KnnModel_2_3,featureMatrix_1_3);
+[Cpred,score_1_3] = predict(KnnModel_2_3,featureMatrix_1_3);
 % check accuracy testdata
 C = confusionmat(Class_1_3,Cpred)
 Acc_Kn_1_3_test = trace(C)/sum(sum(C))
@@ -214,19 +218,24 @@ KnnModel_s = fitcknn(featureMatrix_s, Class_s);
 % use this line for the 3D graph
 %KnnModel = fitcknn(featureMatrix_s, Class_s,'OptimizeHyperparameters','auto')
 % test with small dataset
-[Cpred,score,node] = resubPredict(KnnModel_s);
+[Cpred,score_s,node] = resubPredict(KnnModel_s);
 % check accuracy trainingsdata
 C = confusionmat(Class_s,Cpred)
 Acc_Kn_s_training = trace(C)/sum(sum(C))
 % test with large dataset
-[Cpred,score] = predict(KnnModel_s,featureMatrix_l);
+[Cpred,score_l] = predict(KnnModel_s,featureMatrix_l);
 % check accuracy testdata
 C = confusionmat(Class_l,Cpred)
 Acc_Kn_l_test = trace(C)/sum(sum(C))
 
-%%Visualisation of results
+% Visualisation of results
 result = createGscatter(featureMatrix_2_3,Class_2_3,featureMatrix_1_3,Class_1_3,KnnModel_2_3,featureMatrix_s,Class_s,featureMatrix_l,Class_l,KnnModel_s)
-
+% ROC curves and AUC's
+[result, AUC_bin_2_3_tr, AUC_bin_1_3_te, AUC_bin_s_tr, AUC_bin_l_te] = createAUC(score_2_3,Class_2_3,score_1_3,Class_1_3,score_s,Class_s,score_l,Class_l);
+AUC_bin_2_3_tr
+AUC_bin_1_3_te
+AUC_bin_s_tr
+AUC_bin_l_te
 
 
 
