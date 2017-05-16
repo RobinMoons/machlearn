@@ -1,7 +1,7 @@
-function [plots, AUC1, AUC2, AUC3, AUC4] = createAUC( s_tr, c_tr, s_te, c_te, s_tr2, c_tr2, s_te2, c_te2)
+function [plots, AUC1, AUC2, AUC3, AUC4] = createAUC(windowTitle, s_tr, c_tr, s_te, c_te, s_tr2, c_tr2, s_te2, c_te2)
     [fpr,tpr,T,AUC,OPTROCPT] = perfcurve(c_tr,s_tr(:,1),1);
     AUC1 = AUC;
-    plots = figure('Name', 'ROC curves', 'NumberTitle', 'off')
+    plots = figure('Name', windowTitle, 'NumberTitle', 'off')
     subplot(2,2,1);
     plot(fpr,tpr)
     hold on

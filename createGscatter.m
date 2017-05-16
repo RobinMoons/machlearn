@@ -1,10 +1,10 @@
-function plots = createGscatter( m_tr, c_tr, m_te, c_te, model_1, m_tr2, c_tr2, m_te2, c_te2, model_2)
+function plots = createGscatter(windowTitle, m_tr, c_tr, m_te, c_te, model_1, m_tr2, c_tr2, m_te2, c_te2, model_2)
     d = 0.01;
     [x1Grid,x2Grid] = meshgrid(min(m_tr(:,1)):d:max(m_tr(:,1)), min(m_tr(:,2)):d:max(m_tr(:,2)));
     xGrid = [x1Grid(:),x2Grid(:)];
     labels = predict(model_1,xGrid);
     % Training data points
-    plots = figure('Name', 'Decission tree for binary classification', 'NumberTitle', 'off')
+    plots = figure('Name', windowTitle, 'NumberTitle', 'off')
     subplot(2,2,1);
     h(1:2) = gscatter(xGrid(:,1),xGrid(:,2),labels,[0.1 0.5 0.5; 0.5 0.1 0.5 ]);
     title('training data points 1')

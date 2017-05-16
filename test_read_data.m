@@ -117,9 +117,9 @@ C = confusionmat(Class_l,Cpred)
 Acc_tree_l_test = trace(C)/sum(sum(C))
 
 % Visualisation of results
-result = createGscatter(featureMatrix_2_3,Class_2_3,featureMatrix_1_3,Class_1_3,model_2_3,featureMatrix_s,Class_s,featureMatrix_l,Class_l,model_s);
+result = createGscatter('scatter plots decission tree',featureMatrix_2_3,Class_2_3,featureMatrix_1_3,Class_1_3,model_2_3,featureMatrix_s,Class_s,featureMatrix_l,Class_l,model_s);
 % ROC curves and AUC's
-[result, AUC_bin_2_3_tr, AUC_bin_1_3_te, AUC_bin_s_tr, AUC_bin_l_te] = createAUC(score_2_3,Class_2_3,score_1_3,Class_1_3,score_s,Class_s,score_l,Class_l);
+[result, AUC_bin_2_3_tr, AUC_bin_1_3_te, AUC_bin_s_tr, AUC_bin_l_te] = createAUC('ROC curves decission tree',score_2_3,Class_2_3,score_1_3,Class_1_3,score_s,Class_s,score_l,Class_l);
 AUC_bin_2_3_tr
 AUC_bin_1_3_te
 AUC_bin_s_tr
@@ -153,9 +153,9 @@ C = confusionmat(Class_l,Cpred)
 Acc_svm_l_test = trace(C)/sum(sum(C))
 
 % Visualisation of results
-result = createGscatter(featureMatrix_2_3,Class_2_3,featureMatrix_1_3,Class_1_3,SVMModel_2_3,featureMatrix_s,Class_s,featureMatrix_l,Class_l,SVMModel_s)
+result = createGscatter('scatter plots SVM',featureMatrix_2_3,Class_2_3,featureMatrix_1_3,Class_1_3,SVMModel_2_3,featureMatrix_s,Class_s,featureMatrix_l,Class_l,SVMModel_s)
 % ROC curves and AUC's
-[result, AUC_bin_2_3_tr, AUC_bin_1_3_te, AUC_bin_s_tr, AUC_bin_l_te] = createAUC(score_2_3,Class_2_3,score_1_3,Class_1_3,score_s,Class_s,score_l,Class_l);
+[result, AUC_bin_2_3_tr, AUC_bin_1_3_te, AUC_bin_s_tr, AUC_bin_l_te] = createAUC('ROC curves SVM',score_2_3,Class_2_3,score_1_3,Class_1_3,score_s,Class_s,score_l,Class_l);
 AUC_bin_2_3_tr
 AUC_bin_1_3_te
 AUC_bin_s_tr
@@ -189,9 +189,9 @@ C = confusionmat(Class_l,Cpred)
 Acc_bayes_l_test = trace(C)/sum(sum(C))
 
 % Visualisation of results
-result = createGscatter(featureMatrix_2_3,Class_2_3,featureMatrix_1_3,Class_1_3,BayesModel_2_3,featureMatrix_s,Class_s,featureMatrix_l,Class_l,BayesModel_s)
+result = createGscatter('scatter plots Bayes',featureMatrix_2_3,Class_2_3,featureMatrix_1_3,Class_1_3,BayesModel_2_3,featureMatrix_s,Class_s,featureMatrix_l,Class_l,BayesModel_s)
 % ROC curves and AUC's
-[result, AUC_bin_2_3_tr, AUC_bin_1_3_te, AUC_bin_s_tr, AUC_bin_l_te] = createAUC(score_2_3,Class_2_3,score_1_3,Class_1_3,score_s,Class_s,score_l,Class_l);
+[result, AUC_bin_2_3_tr, AUC_bin_1_3_te, AUC_bin_s_tr, AUC_bin_l_te] = createAUC('ROC curves Bayes',score_2_3,Class_2_3,score_1_3,Class_1_3,score_s,Class_s,score_l,Class_l);
 AUC_bin_2_3_tr
 AUC_bin_1_3_te
 AUC_bin_s_tr
@@ -229,14 +229,13 @@ C = confusionmat(Class_l,Cpred)
 Acc_Kn_l_test = trace(C)/sum(sum(C))
 
 % Visualisation of results
-result = createGscatter(featureMatrix_2_3,Class_2_3,featureMatrix_1_3,Class_1_3,KnnModel_2_3,featureMatrix_s,Class_s,featureMatrix_l,Class_l,KnnModel_s)
+result = createGscatter('scatter plots K nearest',featureMatrix_2_3,Class_2_3,featureMatrix_1_3,Class_1_3,KnnModel_2_3,featureMatrix_s,Class_s,featureMatrix_l,Class_l,KnnModel_s)
 % ROC curves and AUC's
-[result, AUC_bin_2_3_tr, AUC_bin_1_3_te, AUC_bin_s_tr, AUC_bin_l_te] = createAUC(score_2_3,Class_2_3,score_1_3,Class_1_3,score_s,Class_s,score_l,Class_l);
+[result, AUC_bin_2_3_tr, AUC_bin_1_3_te, AUC_bin_s_tr, AUC_bin_l_te] = createAUC('ROC curves K nearest', score_2_3,Class_2_3,score_1_3,Class_1_3,score_s,Class_s,score_l,Class_l);
 AUC_bin_2_3_tr
 AUC_bin_1_3_te
 AUC_bin_s_tr
 AUC_bin_l_te
-
 
 
 
@@ -266,24 +265,7 @@ hold off
 % Extract the accuracy of the binary classifier. 
 % Note that calculating performance measures on the training data gives too optimistic results (overfitting). 
 
-%% SVM one vs the rest code.
-% Overgenomen van voorbeeld code die wel one vs one is.
 
-% SVM classifier one vs one
-
-
-
-
-% ROC curve one vs one
-[fpr,tpr,T,AUC,OPTROCPT] = perfcurve(Clte,score(:,1),1);
-AUC
-figROC=figure('Name', 'SVM - ROC curve testdata (from testData.mat)', 'NumberTitle', 'off')
-plot(fpr,tpr,'.-')
-hold on
-plot(OPTROCPT(1),OPTROCPT(2),'ro')
-xlabel('False positive rate')
-ylabel('True positive rate')
-title('ROC Curve for Classification by Classification SVM linear')
 
 %% Naive bayes as Binary classificcation
 
@@ -308,25 +290,3 @@ for j = 1:2
 end
 
 
-% ROC curve one vs one
-[fpr,tpr,T,AUC,OPTROCPT] = perfcurve(Clte,score(:,1),1);
-AUC
-figROC=figure;
-plot(fpr,tpr,'.-')
-hold on
-plot(OPTROCPT(1),OPTROCPT(2),'ro')
-xlabel('False positive rate')
-ylabel('True positive rate')
-title('ROC Curve for Classification by Naive Bayes')
-
-
-% ROC curve one vs one
-[fpr,tpr,T,AUC,OPTROCPT] = perfcurve(Clte,score(:,1),1);
-AUC
-figure;
-plot(fpr,tpr,'.-')
-hold on
-plot(OPTROCPT(1),OPTROCPT(2),'ro')
-xlabel('False positive rate')
-ylabel('True positive rate')
-title('ROC Curve for Classification by knn')
