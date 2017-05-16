@@ -26,8 +26,8 @@ drinkingFeature = featureExtraction(smallData.drinking);
 brushingFeature = featureExtraction(smallData.brush);
 writingFeature = featureExtraction(smallData.writing);
 shoeFeature = featureExtraction(smallData.shoe);
-col1 = [drinkingFeature(:,4); brushingFeature(:,4); writingFeature(:,4); shoeFeature(:,4)];
-col2 = [drinkingFeature(:,5); brushingFeature(:,5); writingFeature(:,5); shoeFeature(:,5)];
+col1 = [drinkingFeature(:,4); shoeFeature(:,4); brushingFeature(:,4); writingFeature(:,4)];
+col2 = [drinkingFeature(:,5); shoeFeature(:,5); brushingFeature(:,5); writingFeature(:,5)];
 featureMatrix_s = [col1,col2];
 %create class (used to check the results)
 amountDrinking = numel(smallData.drinking);
@@ -36,7 +36,7 @@ amountShoe = numel(smallData.shoe);
 amountWriting = numel(smallData.writing);
 Class_s = [ones(amountDrinking,1);2*ones(amountBrush + amountShoe + amountWriting,1)];   
 %Scatter plots from features 
-featureMatrix_training = [drinkingFeature;brushingFeature;writingFeature;shoeFeature];
+featureMatrix_training = [drinkingFeature;shoeFeature;brushingFeature;writingFeature];
 figure, gplotmatrix(featureMatrix_training,[],Class_s);
 title('gplotmatrix featureMatrix')
 
@@ -64,6 +64,7 @@ numberSamples = numel(largeData.AthensTest_Accel_LN_X_CAL);
 size = 2000;
 numberActivities = floor(numberSamples / size);
 drinkingActivityCounter = 0;
+Class_l = [];
 for activity = 1:1:numberActivities
     drinkingCounter = 0;
     for i = 1:1:size
@@ -76,18 +77,21 @@ for activity = 1:1:numberActivities
         testActiviteiten(activity).z(i) = testDataZ.';
         testActiviteiten(activity).label(i) = testDataLabel.';
         if (testDataLabel == 1) %activity drinking = 1
-            drinkingCounter = drinkingCounter + 1;        
+            drinkingCounter = drinkingCounter +1;
         end 
     end
     if (drinkingCounter > (size/2))
         drinkingActivityCounter = drinkingActivityCounter +1;
+        Class_l = vertcat(Class_l,1);
+    else
+        Class_l = vertcat(Class_l,2);
     end
 end
 %extract features
 featureMatrix_l = featureExtraction(testActiviteiten);
 featureMatrix_l = [featureMatrix_l(:,4),featureMatrix_l(:,5)];
 %create class (used to check the results)
-Class_l = [ones(drinkingActivityCounter,1);2*ones((numberActivities - drinkingActivityCounter),1)];    
+%Class_l = [ones(drinkingActivityCounter,1);2*ones((numberActivities - drinkingActivityCounter),1)];    
 
 %% Decission tree for Binary classification
 % train with 2/3 dataset
@@ -197,7 +201,7 @@ AUC_bin_1_3_te
 AUC_bin_s_tr
 AUC_bin_l_te
 
-%% K-nearest neighbour for binary classification
+%% K-nearest neighbour for binary classification   %%uitbreiden met K en dist kijk naar dichtsbijzijnde, 3 dichtsbijzijnde of optimized
 % train with 2/3 dataset
 KnnModel_2_3 = fitcknn(featureMatrix_2_3,Class_2_3);
 % use this line for the 3D graph
