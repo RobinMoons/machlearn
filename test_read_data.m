@@ -6,8 +6,12 @@ clc;
 %Explanation of variables
 % featureMatrix_s : features from the whole small dataset
 % featureMatrix_l : features from the whole large dataset
+% featureMatrix_1_3 : features from the 1/3 dataset
+% featureMatrix_2_3 : features from the 2/3 dataset
 % Class_s : class from the whole small dataset (chosen DRINKING)
 % Class_l : class from the whole large dataset (chosen DRINKING)
+% Class_1_3 : class from the 1/3 dataset (chosen DRINKING)
+% Class_2_3 : class from the 2/3 dataset (chosen DRINKING)
 
 %% load datasets
 %load large dataset
@@ -31,9 +35,10 @@ amountBrush = numel(smallData.brush);
 amountShoe = numel(smallData.shoe);
 amountWriting = numel(smallData.writing);
 Class_s = [ones(amountDrinking,1);2*ones(amountBrush + amountShoe + amountWriting,1)];   
-% Scatter plots from features 
-figure, gplotmatrix(featureMatrix_s,[],Class_s)
-title('gplotmatrix featureMatrix_s')
+%Scatter plots from features 
+featureMatrix_training = [drinkingFeature;brushingFeature;writingFeature;shoeFeature];
+figure, gplotmatrix(featureMatrix_training,[],Class_s);
+title('gplotmatrix featureMatrix')
 
 %% Extract features from 1/3 and 2/3 dataset from small dataset
 %create array with 4 activities from each feature ( = approx. 1/3 of the set)
@@ -48,14 +53,16 @@ Class_1_3 = [ones(4,1);2*ones(number_1_3-4,1)];
 Class_2_3 = [ones(amountDrinking-4,1);2*ones(number_2_3-(amountDrinking-4),1)]; 
 %extract features from 1/3 set
 featureMatrix_1_3 = featureExtraction(activities_1_3);
+featureMatrix_1_3 = [featureMatrix_1_3(:,4),featureMatrix_1_3(:,5)];
 %extract features from 2/3 set
 featureMatrix_2_3 = featureExtraction(activities_2_3);
+featureMatrix_2_3 = [featureMatrix_2_3(:,4),featureMatrix_2_3(:,5)];
 
 %% Extract features from large data set
 %segmentatie large dataset
-numberSamples = numel(largeData.AthensTest_Accel_LN_X_CAL)
+numberSamples = numel(largeData.AthensTest_Accel_LN_X_CAL);
 size = 2000;
-numberActivities = floor(numberSamples / size)
+numberActivities = floor(numberSamples / size);
 drinkingActivityCounter = 0;
 for activity = 1:1:numberActivities
     drinkingCounter = 0;
@@ -81,53 +88,148 @@ featureMatrix_l = featureExtraction(testActiviteiten);
 featureMatrix_l = [featureMatrix_l(:,4),featureMatrix_l(:,5)];
 %create class (used to check the results)
 Class_l = [ones(drinkingActivityCounter,1);2*ones((numberActivities - drinkingActivityCounter),1)];    
-%Scatter plots from features 
-%figure, gplotmatrix(featureMatrix_l,[],Class_l);
-%title('gplotmatrix featureMatrix_l')
 
-%% Binary classification
-%train with large dataset
-tree = fitctree(featureMatrix_s, Class_s);
-%view(tree)
-%view(tree,'Mode','graph')
-Cpred = predict(tree,[featureMatrix_l(:,4), featureMatrix_l(:,5)]);
-% Check accuracy 
-[Cpred_tr,score,node] = resubPredict(tree);
-C_decision_tr = confusionmat(Class_s,Cpred_tr)
-accuracySmallData = trace(C_decision_tr)/sum(sum(C_decision_tr))
+%% Decission tree for Binary classification
+% train with 2/3 dataset
+model_2_3 = fitctree(featureMatrix_2_3, Class_2_3);
+% test with 2/3 dataset
+[Cpred,score,node] = resubPredict(model_2_3);
+% check accuracy trainingsdata
+C = confusionmat(Class_2_3,Cpred)
+Acc_tree_2_3_training = trace(C)/sum(sum(C))
+% test model with 1/3 data
+[Cpred,score] = predict(model_2_3,featureMatrix_1_3);
+% check accuracy testdata
+C = confusionmat(Class_1_3,Cpred)
+Acc_tree_1_3_test = trace(C)/sum(sum(C))
 
-%train with small dataset
+%hier verder doen, functie maken die 4 ROC plots returnd en de AUC
+% [fpr,tpr,T,AUC,OPTROCPT] = perfcurve(Class_1_3,score(:,1),1);
+% AUC
+% figure('Name', 'ROC curve testsdata 1/3 ', 'NumberTitle', 'off');
+% plot(fpr,tpr)
+% hold on
+% plot(OPTROCPT(1),OPTROCPT(2),'ro')
+% xlabel('False positive rate')
+% ylabel('True positive rate')
+% title('ROC Curve for Classification by Classification Trees')
+% hold off
+
+% train with small dataset
+model_s = fitctree(featureMatrix_s, Class_s);
+% test with small dataset
+[Cpred,score,node] = resubPredict(model_s);
+% check accuracy trainingsdata
+C = confusionmat(Class_s,Cpred)
+Acc_tree_s_training = trace(C)/sum(sum(C))
+% test with large dataset
+[Cpred,score] = predict(model_s,featureMatrix_l);
+% check accuracy testdata
+C = confusionmat(Class_l,Cpred)
+Acc_tree_l_test = trace(C)/sum(sum(C))
+
+%%Visualisation of results
+result = createGscatter(featureMatrix_2_3,Class_2_3,featureMatrix_1_3,Class_1_3,model_2_3,featureMatrix_s,Class_s,featureMatrix_l,Class_l,model_s);
 
 
-%% Visualisation of results
-% help meshgrid
-d = 0.01;
-[x1Grid,x2Grid] = meshgrid(min(featureMatrix_s(:,1)):d:max(featureMatrix_s(:,1)),...
-    min(featureMatrix_s(:,2)):d:max(featureMatrix_s(:,2)));
-xGrid = [x1Grid(:),x2Grid(:)];
-labels = predict(tree,xGrid);
-% Training data points
-figure('Name', 'Division 2D feature space trainingsdata', 'NumberTitle', 'off')
-h(1:2) = gscatter(xGrid(:,1),xGrid(:,2),labels,[0.1 0.5 0.5; 0.5 0.1 0.5 ]);
-hold on
-h(3:4) = gscatter(featureMatrix_s(:,1),featureMatrix_s(:,2),Class_s);
-legend(h,{'Class1','Class2','Class1 Tr','Class2 Tr'},...
-   'Location','Northwest');
-xlabel('x1');
-ylabel('x2');
-% Testing data points
-figure('Name', 'Division 2D feature space testdata (from testData.mat)', 'NumberTitle', 'off')
-h(1:2) = gscatter(xGrid(:,1),xGrid(:,2),labels,[0.1 0.5 0.5; 0.5 0.1 0.5 ]);
-hold on
-h(3:4) = gscatter(featureMatrix_l(:,4),featureMatrix_l(:,5),Clte);
-legend(h,{'Class1','Class2','Class1 Te','Class2 Te'},...
-   'Location','Northwest');
-xlabel('x1');
-ylabel('x2');
 
-%% Accurcy
-C_decision_te = confusionmat(Clte,Cpred)
-accuracyTestData = trace(C_decision_te)/sum(sum(C_decision_te))
+%% SVM for binary classification
+% train with 2/3 dataset
+SVMModel_2_3 = fitcsvm(featureMatrix_2_3,Class_2_3);
+% test with 2/3 dataset
+[Cpred,score,node] = resubPredict(SVMModel_2_3);
+% check accuracy trainingsdata
+C = confusionmat(Class_2_3,Cpred)
+Acc_svm_2_3_training = trace(C)/sum(sum(C))
+% test model with 1/3 data
+[Cpred,score] = predict(SVMModel_2_3,featureMatrix_1_3);
+% check accuracy testdata
+C = confusionmat(Class_1_3,Cpred)
+Acc_svm_1_3_test = trace(C)/sum(sum(C))
+
+% train with small dataset
+SVMModel_s = fitcsvm(featureMatrix_s, Class_s);
+% test with small dataset
+[Cpred,score,node] = resubPredict(SVMModel_s);
+% check accuracy trainingsdata
+C = confusionmat(Class_s,Cpred)
+Acc_svm_s_training = trace(C)/sum(sum(C))
+% test with large dataset
+[Cpred,score] = predict(SVMModel,featureMatrix_l);
+% check accuracy testdata
+C = confusionmat(Class_l,Cpred)
+Acc_svm_l_test = trace(C)/sum(sum(C))
+
+%%Visualisation of results
+result = createGscatter(featureMatrix_2_3,Class_2_3,featureMatrix_1_3,Class_1_3,SVMModel_2_3,featureMatrix_s,Class_s,featureMatrix_l,Class_l,SVMModel_s)
+
+%% Naive Bayes for binary classification 
+% train with 2/3 dataset
+BayesModel_2_3 = fitcnb(featureMatrix_2_3,Class_2_3);
+% test with 2/3 dataset
+[Cpred,score,node] = resubPredict(BayesModel_2_3);
+% check accuracy trainingsdata
+C = confusionmat(Class_2_3,Cpred)
+Acc_bayes_2_3_training = trace(C)/sum(sum(C))
+% test model with 1/3 data
+[Cpred,score] = predict(BayesModel_2_3,featureMatrix_1_3);
+% check accuracy testdata
+C = confusionmat(Class_1_3,Cpred)
+Acc_bayes_1_3_test = trace(C)/sum(sum(C))
+
+% train with small dataset
+BayesModel_s = fitcnb(featureMatrix_s, Class_s);
+% test with small dataset
+[Cpred,score,node] = resubPredict(BayesModel_s);
+% check accuracy trainingsdata
+C = confusionmat(Class_s,Cpred)
+Acc_bayes_s_training = trace(C)/sum(sum(C))
+% test with large dataset
+[Cpred,score] = predict(BayesModel_s,featureMatrix_l);
+% check accuracy testdata
+C = confusionmat(Class_l,Cpred)
+Acc_bayes_l_test = trace(C)/sum(sum(C))
+
+%%Visualisation of results
+result = createGscatter(featureMatrix_2_3,Class_2_3,featureMatrix_1_3,Class_1_3,BayesModel_2_3,featureMatrix_s,Class_s,featureMatrix_l,Class_l,BayesModel_s)
+
+%% K-nearest neighbour for binary classification
+% train with 2/3 dataset
+KnnModel_2_3 = fitcknn(featureMatrix_2_3,Class_2_3);
+% use this line for the 3D graph
+%KnnModel = fitcknn(featureMatrix_2_3,Class_2_3,'OptimizeHyperparameters','auto') 
+% test with 2/3 dataset
+[Cpred,score,node] = resubPredict(KnnModel_2_3);
+% check accuracy trainingsdata
+C = confusionmat(Class_2_3,Cpred)
+Acc_Kn_2_3_training = trace(C)/sum(sum(C))
+% test model with 1/3 data
+[Cpred,score] = predict(KnnModel_2_3,featureMatrix_1_3);
+% check accuracy testdata
+C = confusionmat(Class_1_3,Cpred)
+Acc_Kn_1_3_test = trace(C)/sum(sum(C))
+
+% train with small dataset
+KnnModel_s = fitcknn(featureMatrix_s, Class_s);
+% use this line for the 3D graph
+%KnnModel = fitcknn(featureMatrix_s, Class_s,'OptimizeHyperparameters','auto')
+% test with small dataset
+[Cpred,score,node] = resubPredict(KnnModel_s);
+% check accuracy trainingsdata
+C = confusionmat(Class_s,Cpred)
+Acc_Kn_s_training = trace(C)/sum(sum(C))
+% test with large dataset
+[Cpred,score] = predict(KnnModel_s,featureMatrix_l);
+% check accuracy testdata
+C = confusionmat(Class_l,Cpred)
+Acc_Kn_l_test = trace(C)/sum(sum(C))
+
+%%Visualisation of results
+result = createGscatter(featureMatrix_2_3,Class_2_3,featureMatrix_1_3,Class_1_3,KnnModel_2_3,featureMatrix_s,Class_s,featureMatrix_l,Class_l,KnnModel_s)
+
+
+
+
 
 %% Bram: verder gegaan met de voorbeeldcode van de prof.
 % ROC curve one vs one
@@ -160,51 +262,8 @@ hold off
 
 % SVM classifier one vs one
 
-%help fitcsvm
-%SVMModel = fitcsvm(Xtr(:,1:2),Cltr,'OptimizeHyperparameters','auto');
-SVMModel = fitcsvm(featureMatrix_s(:,1:2),Class_s);
-% Accuracy on trainings data
-%help resubPredict
-[Cpred_tr,score,node] = resubPredict(SVMModel);
-%help confusionmat
-C_SVM_tr = confusionmat(Class_s,Cpred_tr)
-accuracy_SVM_tr = trace(C_SVM_tr)/sum(sum(C_SVM_tr))
 
-% Accuracy on test data
-%help confusionmat
-[Cpred,score] = predict(SVMModel,featureMatrix_l(:,4:5));
-C_SVM_te = confusionmat(Clte,Cpred)
-accuracy_SVM_te = trace(C_SVM_te)/sum(sum(C_SVM_te))
 
-% visualisation of results
-
-%help meshgrid
-d = 0.01;
-[x1Grid,x2Grid] = meshgrid(min(featureMatrix_s(:,1)):d:max(featureMatrix_s(:,1)),...
-    min(featureMatrix_s(:,2)):d:max(featureMatrix_s(:,2)));
-xGrid = [x1Grid(:),x2Grid(:)];
-
-labels = predict(SVMModel,xGrid);
-
-% Training data points
-figure('Name', 'SVM - 2D division feature curve trainingsdata', 'NumberTitle', 'off')
-h(1:2) = gscatter(xGrid(:,1),xGrid(:,2),labels,[0.1 0.5 0.5; 0.5 0.1 0.5 ]);
-hold on
-h(3:4) = gscatter(featureMatrix_s(:,1),featureMatrix_s(:,2),Class_s);
-legend(h,{'Class1','Class2','Class1 Tr','Class2 Tr'},...
-   'Location','Northwest');
-xlabel('x1');
-ylabel('x2');
-
-% Testing data points
-figure('Name', 'SVM - 2D division feature testdata (from testData.mat)', 'NumberTitle', 'off')
-h(1:2) = gscatter(xGrid(:,1),xGrid(:,2),labels,[0.1 0.5 0.5; 0.5 0.1 0.5 ]);
-hold on
-h(3:4) = gscatter(featureMatrix_l(:,4),featureMatrix_l(:,5),Clte);
-legend(h,{'Class1','Class2','Class1 Te','Class2 Te'},...
-   'Location','Northwest');
-xlabel('x1');
-ylabel('x2');
 
 % ROC curve one vs one
 [fpr,tpr,T,AUC,OPTROCPT] = perfcurve(Clte,score(:,1),1);
@@ -218,18 +277,14 @@ ylabel('True positive rate')
 title('ROC Curve for Classification by Classification SVM linear')
 
 %% Naive bayes as Binary classificcation
-% Meshgrid
-d = 0.1;
-[x1Grid,x2Grid] = meshgrid(min(featureMatrix_s(:,1)):d:max(featureMatrix_s(:,1)),...
-    min(featureMatrix_s(:,2)):d:max(featureMatrix_s(:,2)));
-xGrid = [x1Grid(:),x2Grid(:)];
+
 
 % Classification
-bayesTree = fitcnb(featureMatrix_s,Class_s);
+BayesModel = fitcnb(featureMatrix_s,Class_s);
 
-bayesTree
-bayesTree.DistributionParameters
-Params = cell2mat(bayesTree.DistributionParameters);
+BayesModel
+BayesModel.DistributionParameters
+Params = cell2mat(BayesModel.DistributionParameters);
 
 Mu = Params([1 3],1:2); % Extract the means
 Sigma = zeros(2,2,3);
@@ -243,39 +298,6 @@ for j = 1:2
         % Draw contours for the multivariate normal distributions
 end
 
-% Accuracy on trainings data
-%help resubPredict
-[Cpred_tr,score,node] = resubPredict(bayesTree);
-%help confusionmat
-C_bayes_tr = confusionmat(Class_s,Cpred_tr)
-accuracy = trace(C_bayes_tr)/sum(sum(C_bayes_tr))
-
-[Cpred,score] = predict(bayesTree,featureMatrix_l(:,4:5));
-C_bayes_te = confusionmat(Clte,Cpred)
-accuracy = trace(C_bayes_te)/sum(sum(C_bayes_te))
-
-% visualisation of results
-labels = predict(bayesTree,xGrid);
-
-% Training data points
-figure('Name', 'Naive Bayes - 2D division feature curve trainingsdata', 'NumberTitle', 'off')
-h(1:2) = gscatter(xGrid(:,1),xGrid(:,2),labels,[0.1 0.5 0.5; 0.5 0.1 0.5 ]);
-hold on
-h(3:4) = gscatter(featureMatrix_s(:,1),featureMatrix_s(:,2),Class_s);
-legend(h,{'Class1','Class2','Class1 Tr','Class2 Tr'},...
-   'Location','Northwest');
-xlabel('x1');
-ylabel('x2');
-
-% Testing data points
-figure('Name', 'Naive Bayes - 2D division feature curve testdata (from testData.mat)', 'NumberTitle', 'off')
-h(1:2) = gscatter(xGrid(:,1),xGrid(:,2),labels,[0.1 0.5 0.5; 0.5 0.1 0.5 ]);
-hold on
-h(3:4) = gscatter(featureMatrix_l(:,4),featureMatrix_l(:,5),Clte);
-legend(h,{'Class1','Class2','Class1 Te','Class2 Te'},...
-   'Location','Northwest');
-xlabel('x1');
-ylabel('x2');
 
 % ROC curve one vs one
 [fpr,tpr,T,AUC,OPTROCPT] = perfcurve(Clte,score(:,1),1);
@@ -288,57 +310,6 @@ xlabel('False positive rate')
 ylabel('True positive rate')
 title('ROC Curve for Classification by Naive Bayes')
 
-%% K-nearest neighbour as Binary Classification
-% meshgrid
-d = 0.1;
-[x1Grid,x2Grid] = meshgrid(min(featureMatrix_s(:,1)):d:max(featureMatrix_s(:,1)),...
-    min(featureMatrix_s(:,2)):d:max(featureMatrix_s(:,2)));
-xGrid = [x1Grid(:),x2Grid(:)];
-
-% knn Classifier k == 1 dist = euclidian
-% Voor: Mdl = fitcknn(Xtr,Cltr);
-
-% knn Classifier k == opt dist = opt
-
-%werkend bij Bram
-knnTree = fitcknn(featureMatrix_s,Class_s,'OptimizeHyperparameters','auto')
-
-%knnTree = fitcknn(featureMatrix,Class,'Standardize','on')
-
-knnTree
-
-% Accuracy on trainings data
-[Cpred_tr,score,node] = resubPredict(knnTree);
-C_knear_tr = confusionmat(Class_s,Cpred_tr)
-accuracy = trace(C_knear_tr)/sum(sum(C_knear_tr))
-
-% Accuracy on test data
-[Cpred,score] = predict(knnTree,featureMatrix_l(:,4:5));
-C_knear_te = confusionmat(Clte,Cpred)
-accuracy = trace(C_knear_te)/sum(sum(C_knear_te))
-
-% visualisation of results
-labels = predict(knnTree,xGrid);
-
-% Training data points
-figure('Name', 'K-nearest neighbor - 2D division feature curve trainingsdata', 'NumberTitle', 'off')
-h(1:2) = gscatter(xGrid(:,1),xGrid(:,2),labels,[0.1 0.5 0.5; 0.5 0.1 0.5 ]);
-hold on
-h(3:4) = gscatter(featureMatrix_s(:,1),featureMatrix_s(:,2),Class_s);
-legend(h,{'Class1','Class2','Class1 Tr','Class2 Tr'},...
-   'Location','Northwest');
-xlabel('x1');
-ylabel('x2');
-
-% Testing data points
-figure('Name', 'K-nearest neighbor - 2D division feature curve testdata (from testData.mat)', 'NumberTitle', 'off')
-h(1:2) = gscatter(xGrid(:,1),xGrid(:,2),labels,[0.1 0.5 0.5; 0.5 0.1 0.5 ]);
-hold on
-h(3:4) = gscatter(featureMatrix_l(:,4),featureMatrix_l(:,5),Clte);
-legend(h,{'Class1','Class2','Class1 Te','Class2 Te'},...
-   'Location','Northwest');
-xlabel('x1');
-ylabel('x2');
 
 % ROC curve one vs one
 [fpr,tpr,T,AUC,OPTROCPT] = perfcurve(Clte,score(:,1),1);
