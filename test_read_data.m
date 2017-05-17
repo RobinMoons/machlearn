@@ -349,24 +349,24 @@ title('Precision-recall curve for Classification by Classification Trees')
 
 %% Naive bayes as Binary classificcation
 
-
-% Classification
-BayesModel = fitcnb(featureMatrix_s,Class_s);
-
-BayesModel
-BayesModel.DistributionParameters
-Params = cell2mat(BayesModel.DistributionParameters);
-
-Mu = Params([1 3],1:2); % Extract the means
-Sigma = zeros(2,2,3);
-
-face = {'r' , 'b' }
-
-for j = 1:2
-    Sigma(:,:,j) = diag(Params(2*j,:)).^2; % Create diagonal covariance matrix
-    
-    surf(x1Grid,x2Grid,reshape(mvnpdf(xGrid,Mu(j,:),Sigma(:,:,j)),size(x1Grid)),'FaceAlpha',0.5,'FaceColor',face{j})
-        % Draw contours for the multivariate normal distributions
-end
-
+% 
+% % Classification
+% BayesModel = fitcnb(featureMatrix_s,Class_s);
+% 
+% BayesModel
+% BayesModel.DistributionParameters
+% Params = cell2mat(BayesModel.DistributionParameters);
+% 
+% Mu = Params([1 3],1:2); % Extract the means
+% Sigma = zeros(2,2,3);
+% 
+% face = {'r' , 'b' }
+% 
+% for j = 1:2
+%     Sigma(:,:,j) = diag(Params(2*j,:)).^2; % Create diagonal covariance matrix
+%     
+%     surf(x1Grid,x2Grid,reshape(mvnpdf(xGrid,Mu(j,:),Sigma(:,:,j)),size(x1Grid)),'FaceAlpha',0.5,'FaceColor',face{j})
+%         % Draw contours for the multivariate normal distributions
+% end
+% 
 
