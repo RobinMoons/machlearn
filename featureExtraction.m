@@ -1,11 +1,6 @@
 function [ featureMatrix ] = featureExtraction( inputData )
-%FEATUREEXTRACTION Summary of this function goes here
-% Feature extractie van de testdata
-%   Detailed explanation goes here
-
 rows = numel(inputData);
 featureMatrix = zeros(rows,5);
-
 for ii=1:rows
     % Get the x,y,z measurements
     x_Measurement = inputData(ii).x;
@@ -26,7 +21,7 @@ for ii=1:rows
     featureMatrix(ii,2) = std(result);
     featureMatrix(ii,3) = skewness(result);
     
-    Fs = 128;      %sample frequentie
+    Fs = 128;       %sample frequentie
     T = 1/Fs;       %sample periode
     L = 1500;       %lengte van het signaal
     Y = fft(result,L);
