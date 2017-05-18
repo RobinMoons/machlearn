@@ -13,6 +13,12 @@ clc;
 % Class_1_3 : class from the 1/3 dataset (chosen DRINKING)
 % Class_2_3 : class from the 2/3 dataset (chosen DRINKING)
 
+%Select features
+% 1 = mean; 2 = standard deviation; 3 = skewness; 
+% 4 = 25th percentile; 5 = 75the percentile
+ft_a = 4;
+ft_b = 5;
+
 %% load datasets
 %load large dataset
 largeData = load('testDataDetection.mat');
@@ -26,8 +32,8 @@ drinkingFeature = featureExtraction(smallData.drinking);
 brushingFeature = featureExtraction(smallData.brush);
 writingFeature = featureExtraction(smallData.writing);
 shoeFeature = featureExtraction(smallData.shoe);
-col1 = [drinkingFeature(:,4); shoeFeature(:,4); brushingFeature(:,4); writingFeature(:,4)];
-col2 = [drinkingFeature(:,5); shoeFeature(:,5); brushingFeature(:,5); writingFeature(:,5)];
+col1 = [drinkingFeature(:,ft_a); shoeFeature(:,ft_a); brushingFeature(:,ft_a); writingFeature(:,ft_a)];
+col2 = [drinkingFeature(:,ft_b); shoeFeature(:,ft_b); brushingFeature(:,ft_b); writingFeature(:,ft_b)];
 featureMatrix_s = [col1,col2];
 %create class (used to check the results)
 amountDrinking = numel(smallData.drinking);
@@ -53,10 +59,10 @@ Class_1_3 = [ones(4,1);2*ones(number_1_3-4,1)];
 Class_2_3 = [ones(amountDrinking-4,1);2*ones(number_2_3-(amountDrinking-4),1)]; 
 %extract features from 1/3 set
 featureMatrix_1_3 = featureExtraction(activities_1_3);
-featureMatrix_1_3 = [featureMatrix_1_3(:,4),featureMatrix_1_3(:,5)];
+featureMatrix_1_3 = [featureMatrix_1_3(:,ft_a),featureMatrix_1_3(:,ft_b)];
 %extract features from 2/3 set
 featureMatrix_2_3 = featureExtraction(activities_2_3);
-featureMatrix_2_3 = [featureMatrix_2_3(:,4),featureMatrix_2_3(:,5)];
+featureMatrix_2_3 = [featureMatrix_2_3(:,ft_a),featureMatrix_2_3(:,ft_b)];
 
 %% Extract features from large data set
 %segmentatie large dataset
@@ -89,7 +95,7 @@ for activity = 1:1:numberActivities
 end
 %extract features
 featureMatrix_l = featureExtraction(testActiviteiten);
-featureMatrix_l = [featureMatrix_l(:,4),featureMatrix_l(:,5)];
+featureMatrix_l = [featureMatrix_l(:,ft_a),featureMatrix_l(:,ft_b)];
 %create class (used to check the results)
 %Class_l = [ones(drinkingActivityCounter,1);2*ones((numberActivities - drinkingActivityCounter),1)];    
 
@@ -99,12 +105,12 @@ model_2_3 = fitctree(featureMatrix_2_3, Class_2_3);
 % test with 2/3 dataset
 [Cpred,score_2_3,node] = resubPredict(model_2_3);
 % check accuracy trainingsdata
-C_tree_2_3_training = confusionmat(Class_2_3,Cpred)
+C_tree_2_3_training = confusionmat(Class_2_3,Cpred);%
 Acc_tree_2_3_training = trace(C_tree_2_3_training)/sum(sum(C_tree_2_3_training))
 % test model with 1/3 data
 [Cpred,score_1_3] = predict(model_2_3,featureMatrix_1_3);
 % check accuracy testdata
-C_tree_1_3_test = confusionmat(Class_1_3,Cpred)
+C_tree_1_3_test = confusionmat(Class_1_3,Cpred);%
 Acc_tree_1_3_test = trace(C_tree_1_3_test)/sum(sum(C_tree_1_3_test))
 
 % train with small dataset
@@ -112,12 +118,12 @@ model_s = fitctree(featureMatrix_s, Class_s);
 % test with small dataset
 [Cpred,score_s,node] = resubPredict(model_s);
 % check accuracy trainingsdata
-C_tree_s_training = confusionmat(Class_s,Cpred)
+C_tree_s_training = confusionmat(Class_s,Cpred);%
 Acc_tree_s_training = trace(C_tree_s_training)/sum(sum(C_tree_s_training))
 % test with large dataset
 [Cpred,score_l] = predict(model_s,featureMatrix_l);
 % check accuracy testdata
-C_tree_l_test = confusionmat(Class_l,Cpred)
+C_tree_l_test = confusionmat(Class_l,Cpred);%
 Acc_tree_l_test = trace(C_tree_l_test)/sum(sum(C_tree_l_test))
 
 % Visualisation of results
