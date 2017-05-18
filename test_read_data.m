@@ -16,8 +16,8 @@ clc;
 %Select features
 % 1 = mean; 2 = standard deviation; 3 = skewness; 
 % 4 = 25th percentile; 5 = 75the percentile
-ft_a = 1;
-ft_b = 4;
+ft_a = 4;
+ft_b = 5;
 
 
 %% load datasets
@@ -361,7 +361,7 @@ resultaten(4,6) = Acc_KnO_l_test;
 
 %% toon resultaten
 resultaten
-figure('Name', 'Precision-recall curves combined)', 'NumberTitle', 'off')
+figure('Name', 'Precision-recall curves', 'NumberTitle', 'off')
 plot(Prec_tree,Reca_tree)
 hold on
 plot(Prec_svm,Reca_svm)
