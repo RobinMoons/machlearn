@@ -16,8 +16,9 @@ clc;
 %Select features
 % 1 = mean; 2 = standard deviation; 3 = skewness; 
 % 4 = 25th percentile; 5 = 75the percentile
-ft_a = 4;
-ft_b = 5;
+ft_a = 1;
+ft_b = 4;
+
 
 %% load datasets
 %load large dataset
@@ -105,12 +106,12 @@ model_2_3 = fitctree(featureMatrix_2_3, Class_2_3);
 % test with 2/3 dataset
 [Cpred,score_2_3,node] = resubPredict(model_2_3);
 % check accuracy trainingsdata
-C_tree_2_3_training = confusionmat(Class_2_3,Cpred);%
+C_tree_2_3_training = confusionmat(Class_2_3,Cpred)
 Acc_tree_2_3_training = trace(C_tree_2_3_training)/sum(sum(C_tree_2_3_training))
 % test model with 1/3 data
 [Cpred,score_1_3] = predict(model_2_3,featureMatrix_1_3);
 % check accuracy testdata
-C_tree_1_3_test = confusionmat(Class_1_3,Cpred);%
+C_tree_1_3_test = confusionmat(Class_1_3,Cpred)
 Acc_tree_1_3_test = trace(C_tree_1_3_test)/sum(sum(C_tree_1_3_test))
 
 % train with small dataset
@@ -118,22 +119,27 @@ model_s = fitctree(featureMatrix_s, Class_s);
 % test with small dataset
 [Cpred,score_s,node] = resubPredict(model_s);
 % check accuracy trainingsdata
-C_tree_s_training = confusionmat(Class_s,Cpred);%
+C_tree_s_training = confusionmat(Class_s,Cpred)
 Acc_tree_s_training = trace(C_tree_s_training)/sum(sum(C_tree_s_training))
 % test with large dataset
 [Cpred,score_l] = predict(model_s,featureMatrix_l);
 % check accuracy testdata
-C_tree_l_test = confusionmat(Class_l,Cpred);%
+C_tree_l_test = confusionmat(Class_l,Cpred)
 Acc_tree_l_test = trace(C_tree_l_test)/sum(sum(C_tree_l_test))
 
 % Visualisation of results
 result = createGscatter('scatter plots decission tree',featureMatrix_2_3,Class_2_3,featureMatrix_1_3,Class_1_3,model_2_3,featureMatrix_s,Class_s,featureMatrix_l,Class_l,model_s);
 % ROC curves and AUC's
-[result, AUC_tree_2_3_tr, AUC_tree_1_3_te, AUC_tree_s_tr, AUC_tree_l_te] = createAUC('ROC curves decission tree',score_2_3,Class_2_3,score_1_3,Class_1_3,score_s,Class_s,score_l,Class_l);
+[Prec_tree, Reca_tree, result, AUC_tree_2_3_tr, AUC_tree_1_3_te, AUC_tree_s_tr, AUC_tree_l_te] = createAUC(' decission tree',score_2_3,Class_2_3,score_1_3,Class_1_3,score_s,Class_s,score_l,Class_l);
 AUC_tree_2_3_tr
 AUC_tree_1_3_te
 AUC_tree_s_tr
 AUC_tree_l_te
+
+resultaten(1,1) = Acc_tree_2_3_training;
+resultaten(2,1) = Acc_tree_1_3_test;
+resultaten(3,1) = Acc_tree_s_training;
+resultaten(4,1) = Acc_tree_l_test;
 
 %% SVM for binary classification
 % train with 2/3 dataset
@@ -165,11 +171,16 @@ Acc_svm_l_test = trace(C_svm_l_test)/sum(sum(C_svm_l_test))
 % Visualisation of results
 result = createGscatter('scatter plots SVM',featureMatrix_2_3,Class_2_3,featureMatrix_1_3,Class_1_3,SVMModel_2_3,featureMatrix_s,Class_s,featureMatrix_l,Class_l,SVMModel_s)
 % ROC curves and AUC's
-[result, AUC_svm_2_3_tr, AUC_svm_1_3_te, AUC_svm_s_tr, AUC_svm_l_te] = createAUC('ROC curves SVM',score_2_3,Class_2_3,score_1_3,Class_1_3,score_s,Class_s,score_l,Class_l);
+[Prec_svm, Reca_svm, result, AUC_svm_2_3_tr, AUC_svm_1_3_te, AUC_svm_s_tr, AUC_svm_l_te] = createAUC(' SVM',score_2_3,Class_2_3,score_1_3,Class_1_3,score_s,Class_s,score_l,Class_l);
 AUC_svm_2_3_tr
 AUC_svm_1_3_te
 AUC_svm_s_tr
 AUC_svm_l_te
+
+resultaten(1,2) = Acc_svm_2_3_training;
+resultaten(2,2) = Acc_svm_1_3_test;
+resultaten(3,2) = Acc_svm_s_training;
+resultaten(4,2) = Acc_svm_l_test;
 
 %% Naive Bayes for binary classification 
 % train with 2/3 dataset
@@ -201,11 +212,16 @@ Acc_bayes_l_test = trace(C_bayes_l_test)/sum(sum(C_bayes_l_test))
 % Visualisation of results
 result = createGscatter('scatter plots Bayes',featureMatrix_2_3,Class_2_3,featureMatrix_1_3,Class_1_3,BayesModel_2_3,featureMatrix_s,Class_s,featureMatrix_l,Class_l,BayesModel_s)
 % ROC curves and AUC's
-[result, AUC_bayes_2_3_tr, AUC_bayes_1_3_te, AUC_bayes_s_tr, AUC_bayes_l_te] = createAUC('ROC curves Bayes',score_2_3,Class_2_3,score_1_3,Class_1_3,score_s,Class_s,score_l,Class_l);
+[Prec_bayes, Reca_bayes, result, AUC_bayes_2_3_tr, AUC_bayes_1_3_te, AUC_bayes_s_tr, AUC_bayes_l_te] = createAUC(' Bayes',score_2_3,Class_2_3,score_1_3,Class_1_3,score_s,Class_s,score_l,Class_l);
 AUC_bayes_2_3_tr
 AUC_bayes_1_3_te
 AUC_bayes_s_tr
 AUC_bayes_l_te
+
+resultaten(1,3) = Acc_bayes_2_3_training;
+resultaten(2,3) = Acc_bayes_1_3_test;
+resultaten(3,3) = Acc_bayes_s_training;
+resultaten(4,3) = Acc_bayes_l_test;
 
 %% K-nearest neighbour for binary classification   %%uitbreiden met K en dist kijk naar dichtsbijzijnde, 3 dichtsbijzijnde of optimized
 % train with 2/3 dataset
@@ -241,12 +257,16 @@ Acc_Kn_l_test = trace(C_Kn_l_test)/sum(sum(C_Kn_l_test))
 % Visualisation of results
 result = createGscatter('scatter plots K nearest',featureMatrix_2_3,Class_2_3,featureMatrix_1_3,Class_1_3,KnnModel_2_3,featureMatrix_s,Class_s,featureMatrix_l,Class_l,KnnModel_s)
 % ROC curves and AUC's
-[result, AUC_Kn_2_3_tr, AUC_Kn_1_3_te, AUC_Kn_s_tr, AUC_Kn_l_te] = createAUC('ROC curves K nearest', score_2_3,Class_2_3,score_1_3,Class_1_3,score_s,Class_s,score_l,Class_l);
+[Prec_kn, Reca_kn, result, AUC_Kn_2_3_tr, AUC_Kn_1_3_te, AUC_Kn_s_tr, AUC_Kn_l_te] = createAUC(' K nearest', score_2_3,Class_2_3,score_1_3,Class_1_3,score_s,Class_s,score_l,Class_l);
 AUC_Kn_2_3_tr
 AUC_Kn_1_3_te
 AUC_Kn_s_tr
 AUC_Kn_l_te
 
+resultaten(1,4) = Acc_Kn_2_3_training;
+resultaten(2,4) = Acc_Kn_1_3_test;
+resultaten(3,4) = Acc_Kn_s_training;
+resultaten(4,4) = Acc_Kn_l_test;
 %% knn Classifier k == 3 dist = standard euclidian
 % train with 2/3 dataset
 KnnModel_kn3_2_3 = fitcknn(featureMatrix_2_3,Class_2_3,'NumNeighbors',3,'Standardize',1);
@@ -281,11 +301,16 @@ Acc_Kn3_l_test = trace(C_Kn3_l_test)/sum(sum(C_Kn3_l_test))
 % Visualisation of results
 result = createGscatter('scatter plots K nearest',featureMatrix_2_3,Class_2_3,featureMatrix_1_3,Class_1_3,KnnModel_kn3_2_3,featureMatrix_s,Class_s,featureMatrix_l,Class_l,KnnModel_kn3_s)
 % ROC curves and AUC's
-[result, AUC_Kn3_2_3_tr, AUC_Kn3_1_3_te, AUC_Kn3_s_tr, AUC_Kn3_l_te] = createAUC('ROC curves K nearest', score_2_3,Class_2_3,score_1_3,Class_1_3,score_s,Class_s,score_l,Class_l);
+[Prec_kn3, Reca_kn3, result, AUC_Kn3_2_3_tr, AUC_Kn3_1_3_te, AUC_Kn3_s_tr, AUC_Kn3_l_te] = createAUC(' K nearest 3', score_2_3,Class_2_3,score_1_3,Class_1_3,score_s,Class_s,score_l,Class_l);
 AUC_Kn3_2_3_tr
 AUC_Kn3_1_3_te
 AUC_Kn3_s_tr
 AUC_Kn3_l_te
+
+resultaten(1,5) = Acc_Kn3_2_3_training;
+resultaten(2,5) = Acc_Kn3_1_3_test;
+resultaten(3,5) = Acc_Kn3_s_training;
+resultaten(4,5) = Acc_Kn3_l_test;
 
 %% knn Classifier k == opt dist = opt
 % train with 2/3 dataset 
@@ -319,60 +344,37 @@ C_KnO_l_test = confusionmat(Class_l,Cpred)
 Acc_KnO_l_test = trace(C_KnO_l_test)/sum(sum(C_KnO_l_test))
 
 % Visualisation of results
-result = createGscatter('scatter plots K nearest',featureMatrix_2_3,Class_2_3,featureMatrix_1_3,Class_1_3,KnnModel_knO_2_3,featureMatrix_s,Class_s,featureMatrix_l,Class_l,KnnModel_knO_s)
+result = createGscatter('scatter plots K nearest',featureMatrix_2_3,Class_2_3,featureMatrix_1_3,Class_1_3,KnnModel_knO_2_3,featureMatrix_s,Class_s,featureMatrix_l,Class_l,KnnModel_knO_s);
 % ROC curves and AUC's
-[result, AUC_KnO_2_3_tr, AUC_KnO_1_3_te, AUC_KnO_s_tr, AUC_KnO_l_te] = createAUC('ROC curves K nearest', score_2_3,Class_2_3,score_1_3,Class_1_3,score_s,Class_s,score_l,Class_l);
+[Prec_knO, Reca_knO, result, AUC_KnO_2_3_tr, AUC_KnO_1_3_te, AUC_KnO_s_tr, AUC_KnO_l_te] = createAUC(' K nearest opt', score_2_3,Class_2_3,score_1_3,Class_1_3,score_s,Class_s,score_l,Class_l);
 AUC_KnO_2_3_tr
 AUC_KnO_1_3_te
 AUC_KnO_s_tr
 AUC_KnO_l_te
 
-%% Bram: Testen van precision-recall curve.
-% howto: https://www.quora.com/How-can-I-plot-a-precision-recall-curve-in-MATLAB
-% ROC curve one vs one
-% help resubPredict
-[~,score] = resubPredict(BayesModel_s);
-%Class1 vs Class2
-%help perfcurve
-[fpr,tpr,T,AUC_perf] = perfcurve(Class_s,score(:,1),1,'xCrit','reca','yCrit','prec');
-AUC_perf
-figure('Name', 'Precision-recall curve testdata (from testData.mat)', 'NumberTitle', 'off')
-plot(fpr,tpr)
+resultaten(1,6) = Acc_KnO_2_3_training;
+resultaten(2,6) = Acc_KnO_1_3_test;
+resultaten(3,6) = Acc_KnO_s_training;
+resultaten(4,6) = Acc_KnO_l_test;
+
+
+
+%% toon resultaten
+resultaten
+figure('Name', 'Precision-recall curves combined)', 'NumberTitle', 'off')
+plot(Prec_tree,Reca_tree)
+hold on
+plot(Prec_svm,Reca_svm)
+hold on
+plot(Prec_bayes,Reca_bayes)
+hold on
+plot(Prec_kn,Reca_kn)
+hold on
+plot(Prec_kn3,Reca_kn3)
+hold on
+plot(Prec_knO,Reca_knO)
 xlabel('Recal')
 ylabel('Precision')
-title('Precision-recall curve for Classification by Classification Trees')
-
-% Also divide the feature space in the region of the positive instances and the region of the negative instances. 
-% Visualise also in the feature space the training instances. 
-% Plot the Receiver-Operating-Characteristic (ROC) and also calculate the area-under-the-curve (AUC).
-% Use for this purpose the MATLAB instructions perfcurve. 
-% The score is obtained by the MATLAB instruction resubPredict for trees. 
-% Also calculate the confusion matrix on the training set. Use for that the instruction confusionmat in MATLAB.  
-% Extract the accuracy of the binary classifier. 
-% Note that calculating performance measures on the training data gives too optimistic results (overfitting). 
-
-
-
-%% Naive bayes as Binary classificcation
-
-% 
-% % Classification
-% BayesModel = fitcnb(featureMatrix_s,Class_s);
-% 
-% BayesModel
-% BayesModel.DistributionParameters
-% Params = cell2mat(BayesModel.DistributionParameters);
-% 
-% Mu = Params([1 3],1:2); % Extract the means
-% Sigma = zeros(2,2,3);
-% 
-% face = {'r' , 'b' }
-% 
-% for j = 1:2
-%     Sigma(:,:,j) = diag(Params(2*j,:)).^2; % Create diagonal covariance matrix
-%     
-%     surf(x1Grid,x2Grid,reshape(mvnpdf(xGrid,Mu(j,:),Sigma(:,:,j)),size(x1Grid)),'FaceAlpha',0.5,'FaceColor',face{j})
-%         % Draw contours for the multivariate normal distributions
-% end
-% 
+title('Precision-recall curves combined for approach b')
+legend('Tree','SVM','Bayes', 'K-nearest','K-nearest 3', 'K-nearest opt', 'Location','southwest')
 
