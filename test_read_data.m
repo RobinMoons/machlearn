@@ -102,7 +102,8 @@ featureMatrix_l = [featureMatrix_l(:,ft_a),featureMatrix_l(:,ft_b)];
 
 %% Decission tree for Binary classification
 % train with 2/3 dataset
-model_2_3 = fitctree(featureMatrix_2_3, Class_2_3);
+model_2_3 = fitctree(featureMatrix_2_3, Class_2_3)
+view(model_2_3, 'Mode', 'graph')
 % test with 2/3 dataset
 [Cpred,score_2_3,node] = resubPredict(model_2_3);
 % check accuracy trainingsdata
@@ -116,6 +117,7 @@ Acc_tree_1_3_test = trace(C_tree_1_3_test)/sum(sum(C_tree_1_3_test))
 
 % train with small dataset
 model_s = fitctree(featureMatrix_s, Class_s);
+view(model_s, 'Mode', 'graph')
 % test with small dataset
 [Cpred,score_s,node] = resubPredict(model_s);
 % check accuracy trainingsdata
@@ -144,6 +146,13 @@ resultaten(4,1) = Acc_tree_l_test;
 %% SVM for binary classification
 % train with 2/3 dataset
 SVMModel_2_3 = fitcsvm(featureMatrix_2_3,Class_2_3);
+sv = SVMModel_2_3.SupportVectors;
+figure('Name', 'SVM - scatterplot with Support Vectors', 'NumberTitle', 'off');
+gscatter(featureMatrix_2_3(:,1),featureMatrix_2_3(:,2),Class_2_3);
+hold on
+plot(sv(:,1),sv(:,2),'ko','MarkerSize',10)
+legend('1','2','Support Vector')
+hold off
 % test with 2/3 dataset
 [Cpred,score_2_3,node] = resubPredict(SVMModel_2_3);
 % check accuracy trainingsdata

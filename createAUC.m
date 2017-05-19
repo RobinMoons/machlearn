@@ -45,7 +45,7 @@ function [Precission, Recall, plots, AUC1, AUC2, AUC3, AUC4] = createAUC(windowT
     hold off
     
     [fpr,tpr,T,AUC_perf] = perfcurve(c_te2,s_te2(:,1),1,'xCrit','reca','yCrit','prec');
-    figure('Name', 'Precision-recall curve)', 'NumberTitle', 'off')
+    figure('Name', 'Precision-recall curve', 'NumberTitle', 'off')
     plot(fpr,tpr)
     xlabel('Recal')
     ylabel('Precision')
