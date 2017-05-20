@@ -16,8 +16,8 @@ clc;
 %Select features
 % 1 = mean; 2 = standard deviation; 3 = skewness; 
 % 4 = 25th percentile; 5 = 75the percentile
-ft_a = 4;
-ft_b = 5;
+ft_a = 1;
+ft_b = 4;
 
 
 %% load datasets
@@ -323,7 +323,7 @@ resultaten(4,5) = Acc_Kn3_l_test;
 
 %% knn Classifier k == opt dist = opt
 % train with 2/3 dataset 
-KnnModel_knO_2_3 = fitcknn(featureMatrix_2_3,Class_2_3,'OptimizeHyperparameters','auto');
+KnnModel_knO_2_3 = fitcknn(featureMatrix_2_3,Class_2_3,'OptimizeHyperparameters','auto', 'HyperparameterOptimizationOptions',struct('AcquisitionFunctionName','expected-improvement-plus'));
 % use this line for the 3D graph
 %KnnModel = fitcknn(featureMatrix_2_3,Class_2_3,'OptimizeHyperparameters','auto') 
 % test with 2/3 dataset
@@ -336,9 +336,9 @@ Acc_KnO_2_3_training = trace(C_KnO_2_3_training)/sum(sum(C_KnO_2_3_training))
 % check accuracy testdata
 C_KnO_1_3_test = confusionmat(Class_1_3,Cpred)
 Acc_KnO_1_3_test = trace(C_KnO_1_3_test)/sum(sum(C_KnO_1_3_test))
-
+rng(1)
 % train with small dataset
-KnnModel_knO_s = fitcknn(featureMatrix_s, Class_s,'NumNeighbors',3,'Standardize',1);
+KnnModel_knO_s = fitcknn(featureMatrix_s, Class_s,'OptimizeHyperparameters','auto','HyperparameterOptimizationOptions',struct('AcquisitionFunctionName','expected-improvement-plus'));
 % use this line for the 3D graph
 %KnnModel = fitcknn(featureMatrix_s, Class_s,'OptimizeHyperparameters','auto')
 % test with small dataset
